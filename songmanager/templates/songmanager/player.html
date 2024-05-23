@@ -1,0 +1,540 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="icon" type="image/x-icon" href="{% static '/images/favicon_star.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">window.CSRF_TOKEN = "{{ csrf_token }}";</script>
+    <script src="{% static '/js/form_handling.js' %}" defer></script>
+</head>
+
+<body>
+    <script>
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+            }
+        });
+
+    </script>
+    {% include 'songmanager/navbar.html' %}
+    <div class="all-content-player">
+        <div class="player-block">
+            <div class="player-block-music-details">
+                <div class="pbmc-song-details" data-track-id='{{ track_id }}'>
+
+                    <img src='{{ album_art }}' alt="Album Cover" class="album-cover-art">
+                    <h2 class="pbmc-song-name">{{ song_name }}</h2>
+                    <h3 class="pbmc-artist-name">{{ artist_name }}</h3>
+                </div>
+                <div class="info-add-block">
+                    <div class="label-text-small">
+                        <div class="info-btn-h tooltip"><span class="tooltip-text"><span class="tt-detail">Listen
+                                    Again:</span> For when you like a song but aren't sure if you want to add it to your
+                                library. After a song has been played more than 5 times, or if is added to the library,
+                                it
+                                will be removed from the playlist. <br><br>
+                                <span class="tt-detail">Library:</span> A compendium of all of your music. Think of it
+                                analogously to Spotify's 'likes'. <br><br>
+                                <span class="tt-detail">Album in Found Sounds:</span> Adds all songs from the album that
+                                aren't in your library to 'Future,' a to-listen list. When a song is listened to, added
+                                to
+                                the library, or rated, it will be removed from the playlist.</span><img
+                                src="{% static '/images/info_icon.png' %}" alt="Info button for quick add options"
+                                class="info-btn"></div>
+                        Quick Add:
+                    </div>
+                    <div class="quick-add-options">
+                        {% csrf_token %}
+                        <button class="listen-again-btn gray-block-btn qa-btn"
+                            onclick="add_to_listen_again('{{track_id}}')">Listen Again</button>
+                        <button class="add-to-library-btn gray-block-btn qa-btn"
+                            onclick="add_to_library(`{{track_id}}`, `{{song_name}}`, `{{artist_name}}`, `{{album_id}}`)">
+                            Library</button>
+                        <button class="add-album-to-fs-btn gray-block-btn qa-btn"
+                            onclick="add_album_to_found_sounds('{{album_id}}')">Found Sounds (Album)</button>
+                    </div>
+                </div>
+            </div>
+            <div class="player-block-controls">
+                <div class="shuffle-pseudo-btn player-control-icons"><img src="{% static '/images/shuffle_icon.png' %}"
+                        alt="Shuffle icon"></div>
+                <div class="rps-music-controls">
+                    <div class="previous-song-icon player-control-icons"><img src="{% static '/images/skip_icon.png' %}"
+                            alt="Go back to the previous song icon" class="reverse-icon-img"></div>
+                    {% if now_playing %}
+                    <div class="pause-icon"><img src="{% static '/images/pause_icon.png' %}" alt="Play song icon"
+                            class="pause-btn-img"></div>
+                    {% else %}
+                    <div class="play-icon"><img src="{% static '/images/play_icon.png' %}" alt="Pause song icon"></div>
+                    {% endif %}
+                    <div class="skip-icon player-control-icons"><img src="{% static '/images/skip_icon.png' %}"
+                            alt="Skip song icon"></div>
+                </div>
+                <div class="queue-icon player-control-icons"><img src="{% static '/images/queue_icon.png' %}"
+                        alt="Add to queue icon"></div>
+            </div>
+        </div>
+        <div class="form-block">
+            <div class="playlists-append"></div>
+            <div class="form-block-main">
+                <div class="stars-rating">
+                    <div class="star-elem-div"><span class="fa fa-star star-elem" data-rating="1"></span></div>
+                    <div class="star-elem-div"> <span class="fa fa-star star-elem" data-rating="2"></span></div>
+                    <div class="star-elem-div"><span class="fa fa-star star-elem" data-rating="3"></span></div>
+                    <div class="star-elem-div"><span class="fa fa-star star-elem" data-rating="4"></span></div>
+                    <div class="star-elem-div"><span class="fa fa-star star-elem" data-rating="5"></span></div>
+                </div>
+                <hr class="star-divider-hr">
+
+                <div class="block-form-elements">
+                    <div class="atmosphere-emotion-btns">
+                        <div class="atmosphere-btn-div">
+                            <button class="atmosphere-btn gray-block-btn form-btn form-btn-var1">Atmosphere
+                                <span class="dropdown-arrow">
+                                    <img src="{% static '/images/dropdown_arrow.png' %}"
+                                        alt="dropdown arrow to access atmosphere options" class="dropdown-arrow-img"
+                                        id="atmosphere-dropdown-arrow">
+                                </span>
+                            </button>
+                        </div>
+                        <div class="ae-btns-sp"></div>
+                        <div class="emotion-btn-div">
+                            <button class="emotion-btn gray-block-btn form-btn form-btn-var1">Emotion
+                                <span class="dropdown-arrow">
+                                    <img src="{% static '/images/dropdown_arrow.png' %}"
+                                        alt="dropdown arrow to access emotion options" class="dropdown-arrow-img"
+                                        id="emotion-dropdown-arrow">
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="energy-bar gray-block form-bar">
+                        <label>Energy:</label>
+                        <input type="range" min="0" step=1 max="100" value='{{ energy_level }}'
+                            class="slider energy-slider range blue">
+                    </div>
+                    <div class="tag-clear-btns">
+                        <div class="tag-btn-div">
+                            <button class="tag-btn gray-block-btn form-btn form-btn-var1">Tags
+                                <span class="dropdown-arrow">
+                                    <img src="{% static '/images/dropdown_arrow.png' %}"
+                                        alt="dropdown arrow to access tag options" class="dropdown-arrow-img"
+                                        id="tag-dropdown-arrow">
+                                </span>
+                            </button>
+                        </div>
+                        <div class="ae-btns-sp"></div>
+                        <button class="clear-btn black-outline-btn form-btn"
+                            onclick="clear_song_form('{{track_id}}')">Clear Form</button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-block-playlist-add">
+                    <button class="playlist-form-block-btn-player black-block-btn form-btn">Add to Playlist</button>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+    <script>
+        $(document).ready(function () {
+            let currentSongId = '{{ track_id }}';
+            checkLibrary(currentSongId);
+            checkListenAgain(currentSongId);
+            updateCheckedStars(currentSongId);
+
+            $.ajax({
+                url: '/get_user_playlists/',
+                type: 'GET',
+                success: function () {
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error checking library:', error);
+                }
+            });
+        });
+
+
+        function add_to_library(track_id, song_name, artist_name, album_id) {
+            console.log(track_id);
+            console.log(song_name);
+            console.log(artist_name);
+            console.log(album_id);
+
+            fetch('/add_to_library/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    track_id: track_id,
+                    song_name: song_name,
+                    artist_name: artist_name,
+                    album_id: album_id,
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // If the request was successful, redirect to the player page
+                        window.location.href = '/player/';
+                    } else {
+                        // Handle errors if any
+                        console.error('Error adding song to library');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        };
+
+
+        function add_to_listen_again(track_id) {
+            fetch('/add_to_listen_again/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    track_id: track_id
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // If the request was successful, redirect to the player page
+                        window.location.href = '/player/';
+                    } else {
+                        console.error('Error adding song to library');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+
+        function add_album_to_found_sounds(album_id) {
+            fetch('/add_album_to_found_sounds/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    album_id: album_id
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // If the request was successful, redirect to the player page
+                        window.location.href = '/player/';
+                    } else {
+                        console.error('Error adding song to library');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+
+        function update_star_rating(rating) {
+            console.log("{{ track_id }}");
+            console.log(rating);
+            fetch('/add_rating/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    track_id: '{{ track_id }}',
+                    song_name: '{{ song_name }}',
+                    artist_name: '{{ artist_name }}',
+                    album_id: '{{ album_id }}',
+                    rating: rating
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // If the request was successful, redirect to the player page
+                        window.location.href = '/player/';
+                    } else {
+                        // Handle errors if any
+                        console.error('Error updating the rating');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+
+        function update_atmosphere_option(atmosphereButton, atmosphereOption, borderColor) {
+            if (atmosphereButton.classList.contains('included-option')) {
+                atmosphereButton.classList.remove('included-option');
+                atmosphereButton.style.backgroundColor = '#ffffff';
+                atmosphereButton.style.color = '#000000';
+                fetch('/remove_atmosphere_option/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({
+                        track_id: '{{ track_id }}',
+                        song_name: '{{ song_name }}',
+                        artist_name: '{{ artist_name }}',
+                        album_id: '{{ album_id }}',
+                        atmosphere_option: atmosphereOption
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                        } else {
+                            // Handle errors if any
+                            console.error('Error updating the rating');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                atmosphereButton.classList.add('included-option');
+                atmosphereButton.style.backgroundColor = borderColor;
+                atmosphereButton.style.color = '#ffffff';
+                fetch('/add_atmosphere_option/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({
+                        track_id: '{{ track_id }}',
+                        song_name: '{{ song_name }}',
+                        artist_name: '{{ artist_name }}',
+                        album_id: '{{ album_id }}',
+                        atmosphere_option: atmosphereOption
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                        } else {
+                            // Handle errors if any
+                            console.error('Error updating the rating');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        }
+
+        function update_emotion_option(emotionButton, emotionOption, borderColor) {
+            if (emotionButton.classList.contains('included-option')) {
+                emotionButton.classList.remove('included-option');
+                emotionButton.style.backgroundColor = '#ffffff';
+                emotionButton.style.color = '#000000';
+                fetch('/remove_emotion_option/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({
+                        track_id: '{{ track_id }}',
+                        song_name: '{{ song_name }}',
+                        artist_name: '{{ artist_name }}',
+                        album_id: '{{ album_id }}',
+                        emotion_option: emotionOption
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                        } else {
+                            // Handle errors if any
+                            console.error('Error updating the rating');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                emotionButton.classList.add('included-option');
+                emotionButton.style.backgroundColor = borderColor;
+                emotionButton.style.color = '#ffffff';
+                fetch('/add_emotion_option/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({
+                        track_id: '{{ track_id }}',
+                        song_name: '{{ song_name }}',
+                        artist_name: '{{ artist_name }}',
+                        album_id: '{{ album_id }}',
+                        emotion_option: emotionOption
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                        } else {
+                            // Handle errors if any
+                            console.error('Error updating the emotion');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        }
+
+
+        function update_tag_option(tagButton, tagOption, borderColor) {
+            if (tagButton.classList.contains('included-option')) {
+                tagButton.classList.remove('included-option');
+                tagButton.style.backgroundColor = '#ffffff';
+                tagButton.style.color = '#000000';
+                fetch('/remove_song_tag/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({
+                        track_id: '{{ track_id }}',
+                        song_name: '{{ song_name }}',
+                        artist_name: '{{ artist_name }}',
+                        album_id: '{{ album_id }}',
+                        tag_option: tagOption
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                        } else {
+                            // Handle errors if any
+                            console.error('Error updating the rating');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                tagButton.classList.add('included-option');
+                tagButton.style.backgroundColor = borderColor;
+                tagButton.style.color = '#ffffff';
+                fetch('/add_song_tag/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({
+                        track_id: '{{ track_id }}',
+                        song_name: '{{ song_name }}',
+                        artist_name: '{{ artist_name }}',
+                        album_id: '{{ album_id }}',
+                        tag_option: tagOption
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                        } else {
+                            // Handle errors if any
+                            console.error('Error updating the tags');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        }
+
+
+        function add_song_energy_level(sliderValue) {
+            console.log(sliderValue);
+            fetch('/add_energy_level/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    track_id: '{{ track_id }}',
+                    song_name: '{{ song_name }}',
+                    artist_name: '{{ artist_name }}',
+                    album_id: '{{ album_id }}',
+                    energy_level: sliderValue
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                    } else {
+                        console.error('Error updating the rating');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function add_tag_option(tagOption) {
+            fetch('/add_tag_option/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    track_id: '{{ track_id }}',
+                    song_name: '{{ song_name }}',
+                    artist_name: '{{ artist_name }}',
+                    album_id: '{{ album_id }}',
+                    tag_option: tagOption
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/player/';
+                        tagBtn.click();
+                    } else {
+                        console.error('Error adding the tag');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function clear_song_form(trackId) {
+            fetch('/clear_song_form_selections/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    track_id: '{{ track_id }}',
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/player/';
+                    } else {
+                        console.error('Error clearing the song data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+        }
+
+    </script>
+
+</body>
+
+</html>

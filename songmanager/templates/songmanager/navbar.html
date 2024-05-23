@@ -1,0 +1,22 @@
+{% load static %}
+
+<div class="navbar">
+    <div class="navbar-position">
+        <div class="page-nav-icons">
+            <div class="pn-icon"><button class="menu_nav_btn pn-btns"><img src="{% static '/images/menu_icon.png' %}"
+                        alt="Menu icon" class="pn-img"></button></div>
+            <div class="pn-icon icon-inner icon-folder"><button class="music_library_nav_btn pn-btns"><img
+                        src="{% static '/images/music_library_icon.png' %}" alt="Music library icon"
+                        class="pn-img"></button></div>
+            <div class="pn-icon icon-inner"><button class="podcasts_nav_btn pn-btns"><img
+                        src="{% static '/images/podcast_icon.png' %}" alt="Podcast icon" class="pn-img"></button></div>
+            <div class="pn-icon"><button class="search_nav_btn pn-btns"><img
+                        src="{% static '/images/search_icon.png' %}" alt="Search icon" class="pn-img"></button></div>
+        </div>
+        <div class="profile-nav-icon">
+            <div><span class="nav-display-name">{{ display_name }}</span></div>
+            <div class="pn-icon"><button class="profile_nav_btn pn-btns"><img src="{% static '/images/user_icon.png' %}"
+                        alt="Profile icon" class="pn-img"></button></div>
+        </div>
+    </div>
+</div>

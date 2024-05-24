@@ -17,7 +17,9 @@ import os
 import json
 from dotenv import load_dotenv
 import requests
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from django.db.models import Q
+import numpy as np
 load_dotenv()
 
 def lastfm_get(payload, LASTFM_API_KEY):
@@ -563,6 +565,22 @@ def clear_song_form_selections(request):
 
 
 def get_user_playlists(request):
+    current_user = User.objects.get(pk=1) 
+    personal_radio_playlist = Playlist.objects.get(user=current_user, std_name="personal_radio")
+    radio_playlist_id = personal_radio_playlist.playlist_id
+    previously_added_song_ids = personal_radio_playlist.songs.values_list('spotify_id', flat=True)
+    one_week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    two_weeks_ago = datetime.now(timezone.utc) - timedelta(days=14)
+    songs_filtered = UserSong.objects.filter(user=current_user, in_library=True, rating__gte=3)
+    songs_filtered = songs_filtered.filter(Q(last_played__lt=one_week_ago) | Q(last_played__isnull=True))
+    songs_filtered = songs_filtered.filter(Q(last_skipped__lt=two_weeks_ago) | Q(last_skipped__isnull=True))
+    song_ids_filtered = songs_filtered.values_list('song__spotify_id', flat=True) 
+    song_ids_filtered = np.array(song_ids_filtered)
+    previously_added_song_ids = np.array(previously_added_song_ids)
+    songs_to_remove = np.setdiff1d(previously_added_song_ids, song_ids_filtered)
+    songs_to_add = np.setdiff1d(song_ids_filtered, previously_added_song_ids)
+
+
     SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
     SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
     SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
@@ -572,27 +590,31 @@ def get_user_playlists(request):
     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
     token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
     sp = spotipy.Spotify(auth=token)
+    current_user_id = sp.current_user()['id']
+
+    sp.user_playlist_remove_all_occurrences_of_tracks(user=current_user_id, playlist_id=radio_playlist_id, tracks=songs_to_remove)
+    sp.playlist_add_items(playlist_id=radio_playlist_id, items=songs_to_add)
     
-#     data = sp.queue()
-#     queue = data['queue']
-# # Iterate through each item in the queue
-#     for track in queue:
-#         # Each item is a dictionary, access the 'name' key to get the song name
-#         print(track['name'])
+# #     data = sp.queue()
+# #     queue = data['queue']
+# # # Iterate through each item in the queue
+# #     for track in queue:
+# #         # Each item is a dictionary, access the 'name' key to get the song name
+# #         print(track['name'])
 
-    userplaylists = sp.current_user_playlists(offset=0)
-    userplaylists = userplaylists['items']
-    listofusertitles = []
+#     userplaylists = sp.current_user_playlists(offset=0)
+#     userplaylists = userplaylists['items']
+#     listofusertitles = []
 
-    for playlist in userplaylists:
-        usertitles = playlist['name']
-        playlistid = playlist['id']
-        print(usertitles, ": ", playlistid)
+#     for playlist in userplaylists:
+#         usertitles = playlist['name']
+#         playlistid = playlist['id']
+#         print(usertitles, ": ", playlistid)
     return HttpResponse(status=200)
 
 
 def get_quick_select_playlists(request, track_id):
-    current_user = User.objects.get(pk=1)  # Assuming you want to fetch playlists for a specific user, change this as needed
+    current_user = User.objects.get(pk=1) 
     playlists = Playlist.objects.filter(user=current_user, quick_add_option=True)
     
     # List to store playlist objects
@@ -622,4 +644,40 @@ def get_quick_select_playlists(request, track_id):
 
 
 # PLAYLIST MANAGEMENT FUNCTIONS
+
+
+def playlists_view(request):
+    return render(request, 'songmanager/playlists.html')
+    
+
+def update_personal_radio(request):
+    current_user = User.objects.get(pk=1) 
+    personal_radio_playlist = Playlist.objects.get(user=current_user, std_name="personal_radio")
+    radio_playlist_id = personal_radio_playlist.playlist_id
+    previously_added_song_ids = personal_radio_playlist.songs.values_list('spotify_id', flat=True)
+    one_week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    two_weeks_ago = datetime.now(timezone.utc) - timedelta(days=14)
+    songs_filtered = UserSong.objects.filter(user=current_user, in_library=True, rating__gte=3)
+    songs_filtered = songs_filtered.filter(Q(last_played__lt=one_week_ago) | Q(last_played__isnull=True))
+    songs_filtered = songs_filtered.filter(Q(last_skipped__lt=two_weeks_ago) | Q(last_skipped__isnull=True))
+    song_ids_filtered = songs_filtered.values_list('song__spotify_id', flat=True) 
+    song_ids_filtered = np.array(song_ids_filtered)
+    previously_added_song_ids = np.array(previously_added_song_ids)
+    songs_to_remove = np.setdiff1d(previously_added_song_ids, song_ids_filtered)
+    songs_to_add = np.setdiff1d(song_ids_filtered, previously_added_song_ids)
+
+    SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+    SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+    SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
+    username = "ye6bq7h7l9wnphebox5b1jgqu"
+    scope = "playlist-read-private playlist-modify-private playlist-modify-public user-library-read user-library-modify"
+    client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
+    sp = spotipy.Spotify(auth=token)
+    current_user_id = sp.current_user()['id']
+
+    sp.user_playlist_remove_all_occurrences_of_tracks(user=current_user_id, playlist_id=radio_playlist_id, tracks=songs_to_remove)
+    sp.playlist_add_items(playlist_id=radio_playlist_id, items=songs_to_add)
+    return HttpResponse(status=200)
 

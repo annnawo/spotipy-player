@@ -25,6 +25,7 @@ class Song(models.Model):
 class Playlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, null=False)
+    std_name = models.CharField(max_length=100, null=True)
     playlist_id = models.CharField(max_length=150, null=False, primary_key=True)
     quick_add_option = models.BooleanField(default=False, null=True)
     songs = models.ManyToManyField(Song, blank=True)
@@ -52,6 +53,4 @@ class UserSong(models.Model):
     last_played = models.DateTimeField(null=True)
     playlists = models.ManyToManyField(Playlist, blank=True)
     
-
-
 # later, might need to add album table with description and genres and stuff, and image

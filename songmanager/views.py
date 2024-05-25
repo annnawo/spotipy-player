@@ -628,7 +628,62 @@ def get_quick_select_playlists(request, track_id):
 
 
 def playlists_view(request):
-    return render(request, 'songmanager/playlists.html')
+    current_user = User.objects.get(pk=1)
+    # Initialize Spotipy with appropriate credentials
+    SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+    SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+    SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
+    username = "ye6bq7h7l9wnphebox5b1jgqu"
+    scope = "playlist-read-private playlist-modify-private playlist-modify-public user-library-read user-library-modify"
+    client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
+    sp = spotipy.Spotify(auth=token)
+    current_user_id = sp.current_user()['id']
+    # Make a call to the Spotify API to get the currently playing song
+    current_track = sp.current_user_playing_track()
+    user_details = sp.current_user()
+    display_name = user_details['display_name']
+    # prev_track = sp.previous_track()
+
+    # Extract relevant information from the response
+    if current_track is not None and 'item' in current_track and current_track['item']['name'] != "":
+        song_name = current_track['item']['name']
+        artist_name = current_track['item']['artists'][0]['name']
+        album_art = current_track['item']['album']['images'][0]['url']
+        album_id = current_track['item']['album']['id']
+        album_name = current_track['item']['album']['name']
+        track_id = current_track['item']['id']
+        energy_level = get_energy_level(track_id=track_id)
+        playback = sp.current_playback()
+        if playback['item']['id'] == track_id and playback['device']['is_active']:
+            now_playing = True    
+        else:
+            now_playing = False
+        if (check_library_bool(track_id=track_id)):
+            user_song = UserSong.objects.get(user=current_user, song__spotify_id=track_id)
+            user_song.last_played = datetime.now(timezone.utc)
+            user_song.save()
+            
+        return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name, 'album_name': album_name})
+    else: 
+        # If there is no currently playing track, retrieve the most recently played track instead
+        recent_tracks = sp.current_user_recently_played(limit=1)['items']
+        if recent_tracks:
+            # Extract information about the most recently played track
+            recent_track = recent_tracks[0]['track']
+            song_name = recent_track['name']
+            artist_name = recent_track['artists'][0]['name']
+            album_art = recent_track['album']['images'][0]['url']
+            album_id = recent_track['album']['id']
+            album_name = current_track['item']['album']['name']
+            track_id = recent_track['id']
+            energy_level = get_energy_level(track_id=track_id)
+            # Pass the information about the most recently played track to the template
+            return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name, 'album_name': album_name})
+        else:
+            # If there are no recent tracks, return an error message to the template
+            return render(request, 'songmanager/playlists.html', {'error_message': 'No song currently playing'})
     
 
 def update_personal_radio(request):

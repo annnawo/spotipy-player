@@ -13,22 +13,74 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript">window.CSRF_TOKEN = "{{ csrf_token }}";</script>
 </head>
+
 <body>
     {% include 'songmanager/navbar.html' %}
     <div class="wrapper-playlists">
 
         <div class="child-playlist-options-mini-player">
-            <div class="add-playlists-container"></div>
-            <div class="mini-player-container"></div>
+
+            <div class="add-playlists-container">
+
+                <div class="add-playlists-btn-group">
+                    <button class="add-playlists-btn-member new-folder-btn">New Folder</button>
+                    <button class="add-playlists-btn-member new-sm-playlist-btn">New Smart Playlist</button>
+                    <button class="add-playlists-btn-member new-std-playlist-btn">New Standard Playlist</button>
+                </div>
+
+            </div>
+
+            <div class="mini-player-container">
+
+                <div class="mini-player-group">
+
+                    <div class="now-playing-song-description-group">
+                        <div class="album-art-container"><img src='{{ album_art }}' alt="Album Cover"
+                                class="pl-album-cover-art"></div>
+                        <h4 class="pl-song-title pl-song-txt">{{ song_name }}</h4>
+                        <h5 class="pl-album-name pl-song-txt">{{ album_name }}</h5>
+                        <h5 class="pl-artist-name pl-song-txt">{{ artist_name }}</h5>
+                    </div>
+
+                    <div class="pl-mini-player-controls-group">
+                        <div class=“pl-control-div”><img src="{% static '/images/skip_icon.png' %}"
+                                alt="Go back to the previous song icon" class="pl-control-img pl-prev-img"></div>
+                        {% if now_playing %}
+                        <div class="pl-control-div"><img src="{% static '/images/pause_icon.png' %}"
+                                alt="Play song icon" class="pl-control-img">
+                        </div>
+                        {% else %}
+                        <div class="pl-control-div"><img src="{% static '/images/play_icon.png' %}"
+                                alt="Pause song icon" class="pl-control-img"></div>
+                        {% endif %}
+                        <div class="pl-control-div"><img src="{% static '/images/skip_icon.png' %}"
+                                alt="Skip song icon" class="pl-control-img"></div>
+                    </div>
+
+                    <div class="pl-add-song-option-group">
+                        <div><button class="pl-add-song-btn-member">Add to Library</button></div>
+                        <div class="pl-og-add-song-div"><button class="pl-add-song-btn-member">Add to Playlist</button></div>
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
+
         <div class="child-playlists-main-view">
-            <div class="smart-playlists-container"></div>
-            <div class="standard-playlists-container"></div>
+            <div class="smart-playlists-container">
+
+            </div>
+
+            <div class="standard-playlists-container">
+
+            </div>
 
         </div>
 
     </div>
 </body>
+
 </html>

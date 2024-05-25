@@ -1,0 +1,39 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    /* box-sizing: border-box; */
+}
+
+body {
+    width: 100vw;
+    min-height: 100vh;
+    border: solid purple 2px;
+}
+
+.wrapper-playlists {
+    min-height: calc(100vh - 4rem);
+    display: grid;
+    grid-template-columns: 1fr 3.5fr;
+    margin: 0 2.5em;
+}
+
+
+.child-playlist-options-mini-player {
+    display: grid;
+    grid-template-rows: 2.1fr 3.25fr;
+}
+
+.child-playlist-options-mini-player div {
+    border: solid red 1px;
+}
+
+.child-playlists-main-view {
+    display: grid;
+    grid-template-rows: 50%;
+    border: solid 1px blue;
+
+}
+
+.child-playlists-main-view div {
+    border: solid red 1px;
+}

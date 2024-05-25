@@ -8,11 +8,27 @@
     <title>Playlist Management</title>
     <link rel="icon" type="image/x-icon" href="{% static '/images/favicon_star.png' %}">
     <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/playlists.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript">window.CSRF_TOKEN = "{{ csrf_token }}";</script>
 </head>
 <body>
     {% include 'songmanager/navbar.html' %}
+    <div class="wrapper-playlists">
+
+        <div class="child-playlist-options-mini-player">
+            <div class="add-playlists-container"></div>
+            <div class="mini-player-container"></div>
+
+        </div>
+
+        <div class="child-playlists-main-view">
+            <div class="smart-playlists-container"></div>
+            <div class="standard-playlists-container"></div>
+
+        </div>
+
+    </div>
 </body>
 </html>

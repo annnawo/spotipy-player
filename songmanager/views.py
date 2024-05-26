@@ -59,6 +59,7 @@ def player_view(request):
         artist_name = current_track['item']['artists'][0]['name']
         album_art = current_track['item']['album']['images'][0]['url']
         album_id = current_track['item']['album']['id']
+        album_name = current_track['item']['album']['name']
         track_id = current_track['item']['id']
         energy_level = get_energy_level(track_id=track_id)
         playback = sp.current_playback()
@@ -71,7 +72,7 @@ def player_view(request):
             user_song.last_played = datetime.now(timezone.utc)
             user_song.save()
             
-        return render(request, 'songmanager/player.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name})
+        return render(request, 'songmanager/player.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name, 'album_name': album_name})
     else: 
         # If there is no currently playing track, retrieve the most recently played track instead
         recent_tracks = sp.current_user_recently_played(limit=1)['items']
@@ -82,10 +83,11 @@ def player_view(request):
             artist_name = recent_track['artists'][0]['name']
             album_art = recent_track['album']['images'][0]['url']
             album_id = recent_track['album']['id']
+            album_name = recent_track['album']['name']
             track_id = recent_track['id']
             energy_level = get_energy_level(track_id=track_id)
             # Pass the information about the most recently played track to the template
-            return render(request, 'songmanager/player.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name})
+            return render(request, 'songmanager/player.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name, 'album_name': album_name})
         else:
             # If there are no recent tracks, return an error message to the template
             return render(request, 'songmanager/player.html', {'error_message': 'No song currently playing'})
@@ -193,6 +195,8 @@ def add_to_library(request):
         song_name = data.get('song_name')
         artist_name = data.get('artist_name')
         album_id = data.get('album_id')
+        album_name = data.get('album_name')
+        album_art = data.get('album_art')
         
         in_lib = check_library_bool(track_id=track_id)
         if (not in_lib):
@@ -200,11 +204,19 @@ def add_to_library(request):
             genres = get_genres(song_name=song_name, artist_name=artist_name)
             print(genres)
             
+            # Create the album object
+            album, _ = Album.objects.get_or_create(
+                name=album_name,
+                artist=artist_name,
+                spotify_id=album_id,
+                cover_art_url=album_art
+            )
+            
             # Create the song object
             song, _ = Song.objects.get_or_create(
                 title=song_name,
                 artist=artist_name,
-                album=album_id,
+                album_id=album,
                 spotify_id=track_id
             )
             
@@ -564,36 +576,6 @@ def clear_song_form_selections(request):
     return redirect('/player/')
 
 
-def get_user_playlists(request):
-    # SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
-    # SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-    # SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
-    # username = "ye6bq7h7l9wnphebox5b1jgqu"
-    # scope = "playlist-read-private playlist-modify-private playlist-modify-public user-library-read user-library-modify"
-    # client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
-    # sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-    # token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
-    # sp = spotipy.Spotify(auth=token)
-    # current_user_id = sp.current_user()['id']
-    
-# #     data = sp.queue()
-# #     queue = data['queue']
-# # # Iterate through each item in the queue
-# #     for track in queue:
-# #         # Each item is a dictionary, access the 'name' key to get the song name
-# #         print(track['name'])
-
-#     userplaylists = sp.current_user_playlists(offset=0)
-#     userplaylists = userplaylists['items']
-#     listofusertitles = []
-
-#     for playlist in userplaylists:
-#         usertitles = playlist['name']
-#         playlistid = playlist['id']
-#         print(usertitles, ": ", playlistid)
-    return HttpResponse(status=200)
-
-
 def get_quick_select_playlists(request, track_id):
     current_user = User.objects.get(pk=1) 
     playlists = Playlist.objects.filter(user=current_user, quick_add_option=True)
@@ -676,7 +658,7 @@ def playlists_view(request):
             artist_name = recent_track['artists'][0]['name']
             album_art = recent_track['album']['images'][0]['url']
             album_id = recent_track['album']['id']
-            album_name = current_track['item']['album']['name']
+            album_name = recent_track['album']['name']
             track_id = recent_track['id']
             energy_level = get_energy_level(track_id=track_id)
             # Pass the information about the most recently played track to the template
@@ -717,3 +699,38 @@ def update_personal_radio(request):
     sp.playlist_add_items(playlist_id=radio_playlist_id, items=songs_to_add)
     return HttpResponse(status=200)
 
+
+
+# TEST VIEW TEST VIEW TEST VIEW
+def get_user_playlists(request):    
+#     SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+#     SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+#     SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
+#     username = "ye6bq7h7l9wnphebox5b1jgqu"
+#     scope = "playlist-read-private playlist-modify-private playlist-modify-public user-library-read user-library-modify"
+#     client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+#     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+#     token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
+#     sp = spotipy.Spotify(auth=token)
+#     user_playlists = sp.current_user_playlists()
+# # Iterate over playlists and check ownership
+#     for playlist in user_playlists['items']:
+#         playlist_name = playlist['name']
+#         playlist_id = playlist['id']
+#         playlist_owner_id = playlist['owner']['id']
+        
+#         if playlist_owner_id == sp.me()['id']:
+#             print(f"Playlist '{playlist_name}' is created by the user.")
+#         else:
+#             print(f"Playlist '{playlist_name}' is saved or followed by the user.")
+    
+    # current_user_id = sp.current_user()['id']
+#     userplaylists = sp.current_user_playlists(offset=0)
+#     userplaylists = userplaylists['items']
+#     listofusertitles = []
+
+#     for playlist in userplaylists:
+#         usertitles = playlist['name']
+#         playlistid = playlist['id']
+#         print(usertitles, ": ", playlistid)
+    return HttpResponse(status=200)

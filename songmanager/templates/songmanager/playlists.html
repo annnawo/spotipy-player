@@ -53,13 +53,14 @@
                         <div class="pl-control-div"><img src="{% static '/images/play_icon.png' %}"
                                 alt="Pause song icon" class="pl-control-img"></div>
                         {% endif %}
-                        <div class="pl-control-div"><img src="{% static '/images/skip_icon.png' %}"
-                                alt="Skip song icon" class="pl-control-img"></div>
+                        <div class="pl-control-div"><img src="{% static '/images/skip_icon.png' %}" alt="Skip song icon"
+                                class="pl-control-img"></div>
                     </div>
 
                     <div class="pl-add-song-option-group">
                         <div><button class="pl-add-song-btn-member">Add to Library</button></div>
-                        <div class="pl-og-add-song-div"><button class="pl-add-song-btn-member">Add to Playlist</button></div>
+                        <div class="pl-og-add-song-div"><button class="pl-add-song-btn-member">Add to Playlist</button>
+                        </div>
                     </div>
 
                 </div>
@@ -72,9 +73,43 @@
         <div class="child-playlists-main-view">
             <div class="smart-playlists-container">
 
+                <div class="pl-smart-playlists-container">
+
+                    <div class="smart-playlist-heading-bar">
+                        <h1 class="pl-playlist-opt-header">Smart Playlists</h1>
+                        <div class="pl-sphb-group">
+                            <div class="pl-sphb-update-btn-div"><button class="update-smart-playlists-btn">Update
+                                    All</button></div>
+                            <div class="pl-sphb-info-btn">
+                                <img src="{% static '/images/info_icon.png' %}"
+                                    alt="Info button for smart playlist management section" class="pl-info-btn">
+                                <span class="tooltip-text"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
 
             <div class="standard-playlists-container">
+
+                <div class="pl-standard-playlists-container">
+
+                    <div class="standard-playlist-heading-bar">
+                        <h1 class="pl-playlist-opt-header">Standard Playlists</h1>
+                        <div class="pl-sphb-group">
+                            <div class="pl-sphb-update-btn-div"><button class="update-smart-playlists-btn">Update
+                                    All</button></div>
+                            <div class="pl-sphb-info-btn">
+                                <img src="{% static '/images/info_icon.png' %}"
+                                    alt="Info button for smart playlist management section" class="pl-info-btn">
+                                <span class="tooltip-text"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
 
             </div>
 

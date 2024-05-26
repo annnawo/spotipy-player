@@ -4,6 +4,11 @@
     /* box-sizing: border-box; */
 }
 
+@font-face {
+    font-family: Doppelganger;
+    src: url(../fonts/DoppelgangerDisplay.otf);
+}
+
 body {
     width: 100vw;
     min-height: 100vh;
@@ -28,11 +33,7 @@ body {
 .child-playlists-main-view {
     display: grid;
     grid-template-rows: 50%;
-    border: solid 1px blue;
-}
-
-.child-playlists-main-view div {
-    border: solid red 1px;
+    border-left: solid 2px black;
 }
 
 .add-playlists-container{
@@ -143,10 +144,55 @@ body {
     padding-top: .5rem;
 }
 
-.pl-add-song-btn-member {
+.update-smart-playlists-btn, .pl-add-song-btn-member {
     background-color: white;
     border: solid 3px #d9d9d9;
+}
+
+.pl-add-song-btn-member {
     font-size: 1rem;
-    padding: .5rem;
-    border-radius: .5rem;
+    padding: .75rem 1rem;
+    border-radius: 1rem;
+}
+
+.update-smart-playlists-btn {
+    font-size: 1.2rem;
+    padding: .5rem 1.5rem;
+    border-radius: 2rem;
+}
+
+.pl-playlist-opt-header {
+    font-family: Doppelganger;
+    text-decoration: underline;
+    font-weight: normal;
+    font-size: clamp(1.75em, 2vw + 1.75em, 3.20em)
+}
+
+.smart-playlists-container {
+    border-bottom: solid 2px black;
+}
+
+.pl-smart-playlists-container, .pl-standard-playlists-container {
+    margin: 0 3em;
+}
+
+.smart-playlist-heading-bar, .standard-playlist-heading-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2em;
+}
+
+.pl-sphb-group {
+    display: flex;
+    align-items: center;
+}
+
+.pl-sphb-update-btn-div {
+    padding-right: 1em;
+}
+
+.pl-info-btn {
+    height: 3em;
+    width: auto;
 }

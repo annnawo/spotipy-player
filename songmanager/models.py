@@ -15,12 +15,19 @@ class User(models.Model):
 class Genre(models.Model):
     name = models.CharField(max_length=200, null=False)
     
+class Album(models.Model):
+    name = models.CharField(max_length=200, null=False)
+    artist = models.CharField(max_length=200, null=False)
+    spotify_id = models.CharField(max_length=200, null=False, primary_key=True)
+    cover_art_url = models.CharField(max_length=200, null=False)
+    
 class Song(models.Model):
     title = models.CharField(max_length=200, null=False)
     artist = models.CharField(max_length=200, null=False)
-    album = models.CharField(max_length=200, null=False)
+    album_id = models.ForeignKey(Album, null=True, on_delete=models.CASCADE)
     spotify_id = models.CharField(max_length=200, null=False)
     genres = models.ManyToManyField(Genre)
+    
 
 class Playlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -174,6 +174,8 @@
             console.log(song_name);
             console.log(artist_name);
             console.log(album_id);
+            let album_name = '{{ album_name }}';
+            let album_art = '{{ album_art }}';
 
             fetch('/add_to_library/', {
                 method: 'POST',
@@ -185,6 +187,8 @@
                     song_name: song_name,
                     artist_name: artist_name,
                     album_id: album_id,
+                    album_name: album_name,
+                    album_art: album_art
                 })
             })
                 .then(response => {

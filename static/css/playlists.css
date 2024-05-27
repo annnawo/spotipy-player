@@ -328,15 +328,13 @@ body {
   }
   
   .pl-n-2 {
-    transform-origin: top left; /* Rotate around the top-left corner */
+    transform-origin: top left; 
     transform: rotate(-90deg);
-  /*   border: solid 1px red; */
-    height: 2rem; /* Adjust height to accommodate the rotated text */
-    width: 8rem; /* Adjust width as needed */
+    height: 2rem; 
+    width: 8rem; 
     display: flex;
-    align-items: center; /* Horizontally center the rotated text */
+    align-items: center; 
     justify-content: center;
-
   }
   
   

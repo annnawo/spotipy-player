@@ -62,4 +62,3 @@ class UserSong(models.Model):
     last_played = models.DateTimeField(null=True)
     playlists = models.ManyToManyField(Playlist, blank=True)
     
-# later, might need to add album table with description and genres and stuff, and image

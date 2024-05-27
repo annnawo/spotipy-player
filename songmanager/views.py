@@ -731,8 +731,16 @@ def update_personal_radio(request):
     sp = spotipy.Spotify(auth=token)
     current_user_id = sp.current_user()['id']
 
-    sp.user_playlist_remove_all_occurrences_of_tracks(user=current_user_id, playlist_id=radio_playlist_id, tracks=songs_to_remove)
-    sp.playlist_add_items(playlist_id=radio_playlist_id, items=songs_to_add)
+    if len(songs_to_remove) > 0:
+        sp.user_playlist_remove_all_occurrences_of_tracks(user=current_user_id, playlist_id=radio_playlist_id, tracks=songs_to_remove)
+        songs_to_remove_s = Song.objects.filter(spotify_id__in=list(songs_to_remove))
+        personal_radio_playlist.songs.remove(*songs_to_remove_s)
+
+    if len(songs_to_add) > 0:
+        sp.playlist_add_items(playlist_id=radio_playlist_id, items=songs_to_add)
+        songs_to_add_s = Song.objects.filter(spotify_id__in=list(songs_to_add))
+        personal_radio_playlist.songs.add(*songs_to_add_s)
+    
     return HttpResponse(status=200)
 
 

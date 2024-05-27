@@ -18,7 +18,7 @@ import json
 from dotenv import load_dotenv
 import requests
 from datetime import datetime, timezone, timedelta
-from django.db.models import Q
+from django.db.models import Q, Count
 import numpy as np
 load_dotenv()
 
@@ -609,6 +609,39 @@ def get_quick_select_playlists(request, track_id):
 # PLAYLIST MANAGEMENT FUNCTIONS
 
 
+def get_playlists():
+    current_user = User.objects.get(pk=1)
+    playlists = []
+    playlists_filtered = Playlist.objects.filter(user=current_user, created_by_user=True)
+    
+    class PlaylistObj:
+        def __init__(self, name, id):
+            self.name = name
+            self.id = id
+            self.images = []  # Initialize images list
+        
+        def add_image_url(self, url):
+            self.images.append(url)  # Append image URL to images list
+    
+    for playlist in playlists_filtered:
+        playlist_obj = PlaylistObj(playlist.name, playlist.playlist_id)
+        songs = playlist.songs.all()  # Retrieve queryset of related songs
+        counter = 0
+        albums = set()  # Use a set to store unique album IDs
+        for song in songs:
+            if song.album_id_id not in albums:  # Access album ID directly
+                album = Album.objects.get(spotify_id=song.album_id.spotify_id)
+                url = album.cover_art_url
+                playlist_obj.add_image_url(url=url)
+                albums.add(song.album_id_id)  # Add album ID to set
+                counter += 1
+                if counter == 7:
+                    break
+        playlists.append(playlist_obj)  # Append playlist object to playlists list
+    return playlists
+            
+
+
 def playlists_view(request):
     current_user = User.objects.get(pk=1)
     # Initialize Spotipy with appropriate credentials
@@ -627,6 +660,9 @@ def playlists_view(request):
     user_details = sp.current_user()
     display_name = user_details['display_name']
     # prev_track = sp.previous_track()
+    playlists = get_playlists()
+        
+    
 
     # Extract relevant information from the response
     if current_track is not None and 'item' in current_track and current_track['item']['name'] != "":
@@ -647,7 +683,7 @@ def playlists_view(request):
             user_song.last_played = datetime.now(timezone.utc)
             user_song.save()
             
-        return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name, 'album_name': album_name})
+        return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name, 'album_name': album_name, 'playlists':playlists})
     else: 
         # If there is no currently playing track, retrieve the most recently played track instead
         recent_tracks = sp.current_user_recently_played(limit=1)['items']
@@ -662,7 +698,7 @@ def playlists_view(request):
             track_id = recent_track['id']
             energy_level = get_energy_level(track_id=track_id)
             # Pass the information about the most recently played track to the template
-            return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name, 'album_name': album_name})
+            return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name, 'album_name': album_name, 'playlists':playlists})
         else:
             # If there are no recent tracks, return an error message to the template
             return render(request, 'songmanager/playlists.html', {'error_message': 'No song currently playing'})

@@ -20,7 +20,7 @@ class Album(models.Model):
     artist = models.CharField(max_length=200, null=False)
     spotify_id = models.CharField(max_length=200, null=False, primary_key=True)
     cover_art_url = models.CharField(max_length=200, null=False)
-    
+
 class Song(models.Model):
     title = models.CharField(max_length=200, null=False)
     artist = models.CharField(max_length=200, null=False)
@@ -38,6 +38,7 @@ class Playlist(models.Model):
     smart_playlist = models.BooleanField(default=False, null=False)
     created_by_user = models.BooleanField(null=True)
     songs = models.ManyToManyField(Song, blank=True)
+    in_folder = models.BooleanField(null=True, default=False)
 
 class Emotion(models.Model):
     emotion = models.CharField(max_length=100)  
@@ -62,3 +63,8 @@ class UserSong(models.Model):
     last_played = models.DateTimeField(null=True)
     playlists = models.ManyToManyField(Playlist, blank=True)
     
+class Folder(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, null=False)
+    playlists = models.ManyToManyField(Playlist, blank=True)
+    smart_folder = models.BooleanField(default=False, null=False)

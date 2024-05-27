@@ -609,10 +609,10 @@ def get_quick_select_playlists(request, track_id):
 # PLAYLIST MANAGEMENT FUNCTIONS
 
 
-def get_playlists():
+def get_smart_playlists():
     current_user = User.objects.get(pk=1)
     playlists = []
-    playlists_filtered = Playlist.objects.filter(user=current_user, created_by_user=True)
+    playlists_filtered = Playlist.objects.filter(user=current_user, created_by_user=True, smart_playlist=True, in_folder=False)
     
     class PlaylistObj:
         def __init__(self, name, id):
@@ -624,7 +624,7 @@ def get_playlists():
             self.images.append(url)  # Append image URL to images list
     
     for playlist in playlists_filtered:
-        playlist_obj = PlaylistObj(playlist.name, playlist.playlist_id)
+        playlist_obj = PlaylistObj(playlist.std_name, playlist.playlist_id)
         songs = playlist.songs.all()  # Retrieve queryset of related songs
         counter = 0
         albums = set()  # Use a set to store unique album IDs
@@ -639,7 +639,67 @@ def get_playlists():
                     break
         playlists.append(playlist_obj)  # Append playlist object to playlists list
     return playlists
-            
+         
+         
+def get_standard_playlists():
+    current_user = User.objects.get(pk=1)
+    playlists = []
+    playlists_filtered = Playlist.objects.filter(user=current_user, created_by_user=True, smart_playlist=False, in_folder=False)
+    
+    class PlaylistObj:
+        def __init__(self, name, id):
+            self.name = name
+            self.id = id
+            self.images = []  # Initialize images list
+        
+        def add_image_url(self, url):
+            self.images.append(url)  # Append image URL to images list
+    
+    for playlist in playlists_filtered:
+        playlist_obj = PlaylistObj(playlist.std_name, playlist.playlist_id)
+        songs = playlist.songs.all()  # Retrieve queryset of related songs
+        counter = 0
+        albums = set()  # Use a set to store unique album IDs
+        for song in songs:
+            if song.album_id_id not in albums:  # Access album ID directly
+                album = Album.objects.get(spotify_id=song.album_id.spotify_id)
+                url = album.cover_art_url
+                playlist_obj.add_image_url(url=url)
+                albums.add(song.album_id_id)  # Add album ID to set
+                counter += 1
+                if counter == 7:
+                    break
+        playlists.append(playlist_obj)  # Append playlist object to playlists list
+    return playlists   
+
+
+def get_smart_folders():
+    current_user = User.objects.get(pk=1)
+    folders = []
+    folders_filtered = Folder.objects.filter(user=current_user, smart_folder=True)
+    class FolderObj:
+        def __init__(self, name, id):
+            self.name = name
+            self.id = id
+    
+    for folder in folders_filtered:
+        folder_obj = FolderObj(folder.name, folder.id)
+        folders.append(folder_obj)  
+    return folders   
+
+def get_standard_folders():
+    current_user = User.objects.get(pk=1)
+    folders = []
+    folders_filtered = Folder.objects.filter(user=current_user, smart_folder=False)
+    class FolderObj:
+        def __init__(self, name, id):
+            self.name = name
+            self.id = id
+    
+    for folder in folders_filtered:
+        folder_obj = FolderObj(folder.name, folder.id)
+        folders.append(folder_obj)  
+    return folders  
 
 
 def playlists_view(request):
@@ -660,8 +720,10 @@ def playlists_view(request):
     user_details = sp.current_user()
     display_name = user_details['display_name']
     # prev_track = sp.previous_track()
-    playlists = get_playlists()
-        
+    smart_playlists = get_smart_playlists()
+    standard_playlists = get_standard_playlists()
+    smart_folders = get_smart_folders()
+    standard_folders = get_standard_folders()
     
 
     # Extract relevant information from the response
@@ -683,7 +745,7 @@ def playlists_view(request):
             user_song.last_played = datetime.now(timezone.utc)
             user_song.save()
             
-        return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name, 'album_name': album_name, 'playlists':playlists})
+        return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name, 'album_name': album_name, 'smart_playlists':smart_playlists, 'standard_playlists':standard_playlists, 'smart_folders':smart_folders, 'standard_folders':standard_folders})
     else: 
         # If there is no currently playing track, retrieve the most recently played track instead
         recent_tracks = sp.current_user_recently_played(limit=1)['items']
@@ -698,7 +760,7 @@ def playlists_view(request):
             track_id = recent_track['id']
             energy_level = get_energy_level(track_id=track_id)
             # Pass the information about the most recently played track to the template
-            return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name, 'album_name': album_name, 'playlists':playlists})
+            return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name, 'album_name': album_name, 'smart_playlists':smart_playlists, 'standard_playlists':standard_playlists, 'smart_folders':smart_folders, 'standard_folders':standard_folders})
         else:
             # If there are no recent tracks, return an error message to the template
             return render(request, 'songmanager/playlists.html', {'error_message': 'No song currently playing'})
@@ -706,7 +768,7 @@ def playlists_view(request):
 
 def update_personal_radio(request):
     current_user = User.objects.get(pk=1) 
-    personal_radio_playlist = Playlist.objects.get(user=current_user, std_name="personal_radio")
+    personal_radio_playlist = Playlist.objects.get(user=current_user, std_name="personal radio")
     radio_playlist_id = personal_radio_playlist.playlist_id
     previously_added_song_ids = personal_radio_playlist.songs.values_list('spotify_id', flat=True)
     one_week_ago = datetime.now(timezone.utc) - timedelta(days=7)

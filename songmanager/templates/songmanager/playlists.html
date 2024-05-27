@@ -88,39 +88,16 @@
                         </div>
                     </div>
 
-                    <!-- <div class="playlists-and-folders-main-container">
-                        {% if playlists %}
-                        {% if playlists|length == 1 %}
-                        <h1>Playlist</h1>
-                        <h2>{{ playlists.0.name }}</h2>
-                        <div class="album-images">
-                            {% for image_url in playlists.0.images %}
-                            <img src="{{ image_url }}" alt="Album Cover">
-                            {% endfor %}
-                        </div>
-                        {% else %}
-                        <h1>Playlists</h1>
-                        {% for playlist in playlists %}
-                        <h2>{{ playlist.name }}</h2>
-                        <div class="album-images">
-                            {% for image_url in playlist.images %}
-                            <img src="{{ image_url }}" alt="Album Cover">
-                            {% endfor %}
-                        </div>
-                        {% endfor %}
+                    <div class="playlists-and-folders-main-container playlists-container">
+                        {% if smart_folders %}
+                        <div>{{ smart_folders.0.name }}</div>
                         {% endif %}
-                        {% else %}
-                        <p>No playlists found.</p>
-                        {% endif %}
-                    </div> -->
-
-                    <div class="playlists-and-folders-main-container">
-                        {% if playlists %}
-                        {% if playlists|length == 1 %}
+                        {% if smart_playlists %}
+                        {% if smart_playlists|length == 1 %}
 
                         <div class="playlist-main-holder-2">
                             <div class="playlist-name-container-2">
-                                <h5 class="playlist-name pl-n-2">{{ playlists.0.name }}</h5>
+                                <h5 class="playlist-name pl-n-2">{{ smart_playlists.0.name }}</h5>
                             </div>
                             <div class="edit-bar-options ebo-2">
                                 <div class="eb-positions">
@@ -149,21 +126,21 @@
 
                             <div class="outer-grid outer-grid-2">
                                 <div class="album-cover-grid">
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.0 }}"
+                                    <div class="cover-img-div"><img src="{{ smart_playlists.0.images.0 }}"
                                             class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.1 }}"
+                                    <div class="cover-img-div"><img src="{{ smart_playlists.0.images.1 }}"
                                             class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.2 }}"
+                                    <div class="cover-img-div"><img src="{{ smart_playlists.0.images.2 }}"
                                             class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.3 }}"
+                                    <div class="cover-img-div"><img src="{{ smart_playlists.0.images.3 }}"
                                             class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.4 }}"
+                                    <div class="cover-img-div"><img src="{{ smart_playlists.0.images.4 }}"
                                             class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.5 }}"
+                                    <div class="cover-img-div"><img src="{{ smart_playlists.0.images.5 }}"
                                             class="album-cover-member"></div>
                                     <div class="album-cover-member acm-div"></div>
                                     <div class="album-cover-member acm-div"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.6 }}"
+                                    <div class="cover-img-div"><img src="{{ smart_playlists.0.images.6 }}"
                                             class="album-cover-member"></div>
                                 </div>
                             </div>
@@ -171,11 +148,11 @@
                         </div>
 
                         {% else %}
-                        {% for playlist in playlists %}
-
+                        {% for playlist in smart_playlists %}
+                        <div class="playlist-container">
                         <div class="playlist-main-holder-2">
                             <div class="playlist-name-container-2">
-                                <h5 class="playlist-name pl-n-2">{{ playlists.0.name }}</h5>
+                                <h5 class="playlist-name pl-n-2">{{ playlist.name }}</h5>
                             </div>
                             <div class="edit-bar-options ebo-2">
                                 <div class="eb-positions">
@@ -204,27 +181,28 @@
 
                             <div class="outer-grid outer-grid-2">
                                 <div class="album-cover-grid">
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.0 }}"
+                                    <div class="cover-img-div"><img src="{{ playlist.images.0 }}"
                                             class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.1 }}"
+                                    <div class="cover-img-div"><img src="{{ playlist.images.1 }}"
                                             class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.2 }}"
+                                    <div class="cover-img-div"><img src="{{ playlist.images.2 }}"
                                             class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.3 }}"
+                                    <div class="cover-img-div"><img src="{{ playlist.images.3 }}"
                                             class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.4 }}"
+                                    <div class="cover-img-div"><img src="{{ playlist.images.4 }}"
                                             class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.5 }}"
+                                    <div class="cover-img-div"><img src="{{ playlist.images.5 }}"
                                             class="album-cover-member"></div>
                                     <div class="album-cover-member acm-div"></div>
                                     <div class="album-cover-member acm-div"></div>
-                                    <div class="cover-img-div"><img src="{{ playlists.0.images.6 }}"
+                                    <div class="cover-img-div"><img src="{{ playlist.images.6 }}"
                                             class="album-cover-member"></div>
                                 </div>
                             </div>
-
                         </div>
+                    </div>
                         {% endfor %}
+
                         {% endif %}
                         {% endif %}
 
@@ -241,8 +219,6 @@
                     <div class="standard-playlist-heading-bar">
                         <h1 class="pl-playlist-opt-header">Standard Playlists</h1>
                         <div class="pl-sphb-group">
-                            <div class="pl-sphb-update-btn-div"><button class="update-smart-playlists-btn">Update
-                                    All</button></div>
                             <div class="pl-sphb-info-btn">
                                 <img src="{% static '/images/info_icon.png' %}"
                                     alt="Info button for smart playlist management section" class="pl-info-btn">
@@ -250,6 +226,125 @@
                             </div>
                         </div>
                     </div>
+
+
+                    <div class="playlists-and-folders-main-container playlists-container">
+                        {% if standard_playlists %}
+                        {% if standard_playlists|length == 1 %}
+
+                        <div class="playlist-main-holder-2">
+                            <div class="playlist-name-container-2">
+                                <h5 class="playlist-name pl-n-2">{{ standard_playlists.0.name }}</h5>
+                            </div>
+                            <div class="edit-bar-options ebo-2">
+                                <div class="eb-positions">
+                                    <div class="eb-icons">
+                                        <div><button class="eb-icon-btn"><img
+                                                    src="{% static '/images/shuffle_icon.png' %}" alt="shuffle symbol"
+                                                    class="icon-member"></button></div>
+                                        <div><button class="eb-icon-btn"><img
+                                                    src="{% static '/images/queue_icon.png' %}" alt="queue symbol"
+                                                    class="icon-member"></button></div>
+                                        <div><button class="eb-icon-btn">
+                                                <div class="star-elem-div"><span class="fa fa-star star-elem-2"></span>
+                                                </div>
+                                            </button></div>
+                                        <div><button class="eb-icon-btn"><img
+                                                    src="{% static '/images/trash_icon.png' %}" alt="delete symbol"
+                                                    class="icon-member trash-icon"></button></div>
+                                    </div>
+                                    <div class="eb-buttons">
+                                        <button class="button-edit-bar">play</button>
+                                        <button class="button-edit-bar">edit</button>
+                                        <button class="button-edit-bar">view</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="outer-grid outer-grid-2">
+                                <div class="album-cover-grid">
+                                    <div class="cover-img-div"><img src="{{ standard_playlists.0.images.0 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="cover-img-div"><img src="{{ standard_playlists.0.images.1 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="cover-img-div"><img src="{{ standard_playlists.0.images.2 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="cover-img-div"><img src="{{ standard_playlists.0.images.3 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="cover-img-div"><img src="{{ standard_playlists.0.images.4 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="cover-img-div"><img src="{{ standard_playlists.0.images.5 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="album-cover-member acm-div"></div>
+                                    <div class="album-cover-member acm-div"></div>
+                                    <div class="cover-img-div"><img src="{{ standard_playlists.0.images.6 }}"
+                                            class="album-cover-member"></div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {% else %}
+                        {% for playlist in standard_playlists %}
+                        <div class="playlist-container">
+                        <div class="playlist-main-holder-2">
+                            <div class="playlist-name-container-2">
+                                <h5 class="playlist-name pl-n-2">{{ playlist.name }}</h5>
+                            </div>
+                            <div class="edit-bar-options ebo-2">
+                                <div class="eb-positions">
+                                    <div class="eb-icons">
+                                        <div><button class="eb-icon-btn"><img
+                                                    src="{% static '/images/shuffle_icon.png' %}" alt="shuffle symbol"
+                                                    class="icon-member"></button></div>
+                                        <div><button class="eb-icon-btn"><img
+                                                    src="{% static '/images/queue_icon.png' %}" alt="queue symbol"
+                                                    class="icon-member"></button></div>
+                                        <div><button class="eb-icon-btn">
+                                                <div class="star-elem-div"><span class="fa fa-star star-elem-2"></span>
+                                                </div>
+                                            </button></div>
+                                        <div><button class="eb-icon-btn"><img
+                                                    src="{% static '/images/trash_icon.png' %}" alt="delete symbol"
+                                                    class="icon-member trash-icon"></button></div>
+                                    </div>
+                                    <div class="eb-buttons">
+                                        <button class="button-edit-bar">play</button>
+                                        <button class="button-edit-bar">edit</button>
+                                        <button class="button-edit-bar">view</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="outer-grid outer-grid-2">
+                                <div class="album-cover-grid">
+                                    <div class="cover-img-div"><img src="{{ playlist.images.0 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="cover-img-div"><img src="{{ playlist.images.1 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="cover-img-div"><img src="{{ playlist.images.2 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="cover-img-div"><img src="{{ playlist.images.3 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="cover-img-div"><img src="{{ playlist.images.4 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="cover-img-div"><img src="{{ playlist.images.5 }}"
+                                            class="album-cover-member"></div>
+                                    <div class="album-cover-member acm-div"></div>
+                                    <div class="album-cover-member acm-div"></div>
+                                    <div class="cover-img-div"><img src="{{ playlist.images.6 }}"
+                                            class="album-cover-member"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        {% endfor %}
+
+                        {% endif %}
+                        {% endif %}
+
+                    </div>
+
 
                 </div>
 

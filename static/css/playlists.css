@@ -203,10 +203,6 @@ body {
 
 
 /* Playlist Holder Styling */
-
-/*  */
-/*  */
-
   
   .album-cover-grid {
     border: solid 2px black;
@@ -250,7 +246,7 @@ body {
   }
   
   .eb-positions {
-    position: relative;
+    /* position: relative; */
     height: 5rem;
     display: flex;
     flex-direction: column;
@@ -286,19 +282,12 @@ body {
     padding: .25rem .5rem;
   }
   
-  .playlist-name-container {
-    position: absolute;
-    z-index: 10000;
-    top: 2.75rem;
-  /*   border: solid red 1px; */
-  }
-  
   .pln-c {
     transform: rotate(-90deg);
     padding-bottom: 2.2rem;
   }
   
-  .playlist-name {
+  .playlist-name, .folder-name {
     font-family: "Lora", serif;
     font-size: 1.45rem;
     font-style: italic;
@@ -306,6 +295,7 @@ body {
   
   .playlist-main-holder-2 {
     position: relative;
+    margin-top: .75rem;
   }  
   
   .outer-grid-2, .ebo-2 {
@@ -349,12 +339,92 @@ body {
     height: auto;
 }
 
-.playlists-container {
-    display: flex;
-    flex-wrap: wrap; /* Adjust as needed */
-    align-items: flex-start; /* Or other align-items value */
+
+/* Folder Styling */
+
+.folder-main-holder {
+    position: relative;
+    margin-right: 2rem;
 }
 
-.playlist-container {
-    width: 30%; 
+  .folder-img {
+    width: 13rem;
+    height: auto;
+  }
+
+  .edit-del-options-f {
+    position: absolute;
+    top: 10rem;
+  }
+
+  .edf-icons {
+    display: flex;
+    z-index: 100;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 7.25rem;
+  }
+
+  .trash-icon-2 {
+    width: 1.75rem;
+    height: auto;
+  }
+
+  .star-elem-3 {
+    font-size: 2rem !important;
+  }
+
+  .button-edit-del-f {
+    font-size: .85rem;
+    background: none;
+    background-color: white;
+    border: solid 2px #d9d9d9;
+    border-radius: 2rem;
+    padding: .25rem .5rem;
+  }
+
+  .eb-icon-trash {
+    margin-top: .25rem;
+  }
+
+  .folder-name-container {
+    position: absolute;
+    z-index: 10000;
+    width: 2rem;
+    height: 10rem;
+    /* border: solid greenyellow 2px; */
+    text-wrap: wrap;
+    text-align: center;
+    line-height: 1.5rem;
+    margin-top: 10rem;
+  }
+
+  .fl-n-2 {
+    transform-origin: top left; 
+    transform: rotate(-90deg);
+    height: 2rem; 
+    width: 9.5rem; 
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+
+  }
+
+  .folder-img-outer-container, .edit-del-options-f {
+    margin-left: 2rem;
+  }
+
+  /*  */
+
+  .playlists-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center; 
+    justify-content: start;
+    height: 15rem;
+}
+
+.outer-pos-playlist-div {
+    height: 15rem;
+    display: flex
 }

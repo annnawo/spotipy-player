@@ -31,4 +31,10 @@ urlpatterns = [
     path('clear_song_form_selections/', views.clear_song_form_selections, name='clear_song_form_selections'),
     path('get_user_playlists/', views.get_user_playlists, name='get_user_playlists'),
     path('get_quick_select_playlists/<str:track_id>/', views.get_quick_select_playlists, name='get_quick_select_playlists'),
+    
+    
+    path('play_playlist/', views.play_playlist, name='play_playlist'),
+    path('queue_playlist/', views.queue_playlist, name='queue_playlist'),
+    
+    
 ]

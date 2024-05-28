@@ -806,9 +806,57 @@ def update_personal_radio(request):
     return HttpResponse(status=200)
 
 
+def play_playlist(request):
+    if request.method == 'POST':
+        current_user = User.objects.get(pk=1)
+        # Parse JSON data from the request body
+        data = json.loads(request.body)
+        # Extract relevant data
+        playlist_id = data.get('playlist_id')
+        playlist_uri = "spotify:playlist:" + playlist_id
+        
+        SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+        SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+        SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
+        username = "ye6bq7h7l9wnphebox5b1jgqu"
+        scope = "playlist-read-private playlist-modify-private playlist-modify-public user-library-read user-library-modify"
+        client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+        sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+        token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
+        sp = spotipy.Spotify(auth=token)
+        
+        sp.start_playback(context_uri=playlist_uri)
+    return HttpResponse(status=200)
+        
+
+def queue_playlist(request):
+    if request.method == 'POST':
+        SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+        SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+        SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
+        username = "ye6bq7h7l9wnphebox5b1jgqu"
+        scope = "playlist-read-private playlist-modify-private playlist-modify-public user-library-read user-library-modify"
+        client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+        sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+        token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
+        sp = spotipy.Spotify(auth=token)
+        current_user = User.objects.get(pk=1)
+        data = json.loads(request.body)
+        playlist_id = data.get('playlist_id')
+        playlist = Playlist.objects.get(user=current_user, playlist_id=playlist_id)
+        songs = playlist.songs.all()
+        for song in songs:
+            song_uri = "spotify:track:" + song.spotify_id
+            sp.add_to_queue(uri=song_uri)
+    
+    return HttpResponse(status=200)
+
+
+
 
 # TEST VIEW TEST VIEW TEST VIEW
 def get_user_playlists(request):    
+    
 #     SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 #     SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 #     SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')

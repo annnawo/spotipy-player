@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript">window.CSRF_TOKEN = "{{ csrf_token }}";</script>
+    <script src="{% static '/js/playlists.js' %}" defer></script>
 </head>
 
 <body>
@@ -127,57 +128,58 @@
 
                         {% for playlist in smart_playlists %}
                         <div class="outer-pos-playlist-div">
-                        <div class="playlist-main-holder-2">
-                            <div class="playlist-name-container-2">
-                                <h5 class="playlist-name pl-n-2">{{ playlist.name }}</h5>
-                            </div>
-                            <div class="edit-bar-options ebo-2">
-                                <div class="eb-positions">
-                                    <div class="eb-icons">
-                                        <div><button class="eb-icon-btn"><img
-                                                    src="{% static '/images/shuffle_icon.png' %}" alt="shuffle symbol"
-                                                    class="icon-member"></button></div>
-                                        <div><button class="eb-icon-btn"><img
-                                                    src="{% static '/images/queue_icon.png' %}" alt="queue symbol"
-                                                    class="icon-member"></button></div>
-                                        <div><button class="eb-icon-btn">
-                                                <div class="star-elem-div"><span class="fa fa-star star-elem-2"></span>
-                                                </div>
-                                            </button></div>
-                                        <div><button class="eb-icon-btn"><img
-                                                    src="{% static '/images/trash_icon.png' %}" alt="delete symbol"
-                                                    class="icon-member trash-icon"></button></div>
-                                    </div>
-                                    <div class="eb-buttons">
-                                        <button class="button-edit-bar">play</button>
-                                        <button class="button-edit-bar">edit</button>
-                                        <button class="button-edit-bar">view</button>
+                            <div class="playlist-main-holder-2" data-playlist-id='{{ playlist.id }}'>
+                                <div class="playlist-name-container-2">
+                                    <h5 class="playlist-name pl-n-2">{{ playlist.name }}</h5>
+                                </div>
+                                <div class="edit-bar-options ebo-2">
+                                    <div class="eb-positions">
+                                        <div class="eb-icons">
+                                            <div><button class="eb-icon-btn"><img
+                                                        src="{% static '/images/shuffle_icon.png' %}"
+                                                        alt="shuffle symbol" class="icon-member"></button></div>
+                                            <div><button class="eb-icon-btn queue-button"><img
+                                                        src="{% static '/images/queue_icon.png' %}" alt="queue symbol"
+                                                        class="icon-member"></button></div>
+                                            <div><button class="eb-icon-btn">
+                                                    <div class="star-elem-div"><span
+                                                            class="fa fa-star star-elem-2"></span>
+                                                    </div>
+                                                </button></div>
+                                            <div><button class="eb-icon-btn"><img
+                                                        src="{% static '/images/trash_icon.png' %}" alt="delete symbol"
+                                                        class="icon-member trash-icon"></button></div>
+                                        </div>
+                                        <div class="eb-buttons">
+                                            <button class="button-edit-bar play-playlist-btn">play</button>
+                                            <button class="button-edit-bar">edit</button>
+                                            <button class="button-edit-bar">update</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="outer-grid outer-grid-2">
-                                <div class="album-cover-grid">
-                                    <div class="cover-img-div"><img src="{{ playlist.images.0 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.1 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.2 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.3 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.4 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.5 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="album-cover-member acm-div"></div>
-                                    <div class="album-cover-member acm-div"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.6 }}"
-                                            class="album-cover-member"></div>
+                                <div class="outer-grid outer-grid-2">
+                                    <div class="album-cover-grid">
+                                        <div class="cover-img-div"><img src="{{ playlist.images.0 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.1 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.2 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.3 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.4 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.5 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="album-cover-member acm-div"></div>
+                                        <div class="album-cover-member acm-div"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.6 }}"
+                                                class="album-cover-member"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                         {% endfor %}
 
 
@@ -209,56 +211,57 @@
                         {% if standard_playlists %}
                         {% for playlist in standard_playlists %}
                         <div class="outer-pos-playlist-div">
-                        <div class="playlist-main-holder-2">
-                            <div class="playlist-name-container-2">
-                                <h5 class="playlist-name pl-n-2">{{ playlist.name }}</h5>
-                            </div>
-                            <div class="edit-bar-options ebo-2">
-                                <div class="eb-positions">
-                                    <div class="eb-icons">
-                                        <div><button class="eb-icon-btn"><img
-                                                    src="{% static '/images/shuffle_icon.png' %}" alt="shuffle symbol"
-                                                    class="icon-member"></button></div>
-                                        <div><button class="eb-icon-btn"><img
-                                                    src="{% static '/images/queue_icon.png' %}" alt="queue symbol"
-                                                    class="icon-member"></button></div>
-                                        <div><button class="eb-icon-btn">
-                                                <div class="star-elem-div"><span class="fa fa-star star-elem-2"></span>
-                                                </div>
-                                            </button></div>
-                                        <div><button class="eb-icon-btn"><img
-                                                    src="{% static '/images/trash_icon.png' %}" alt="delete symbol"
-                                                    class="icon-member trash-icon"></button></div>
-                                    </div>
-                                    <div class="eb-buttons">
-                                        <button class="button-edit-bar">play</button>
-                                        <button class="button-edit-bar">edit</button>
-                                        <button class="button-edit-bar">view</button>
+                            <div class="playlist-main-holder-2" data-playlist-id='{{ playlist.id }}'>
+                                <div class="playlist-name-container-2">
+                                    <h5 class="playlist-name pl-n-2">{{ playlist.name }}</h5>
+                                </div>
+                                <div class="edit-bar-options ebo-2">
+                                    <div class="eb-positions">
+                                        <div class="eb-icons">
+                                            <div><button class="eb-icon-btn"><img
+                                                        src="{% static '/images/shuffle_icon.png' %}"
+                                                        alt="shuffle symbol" class="icon-member"></button></div>
+                                            <div><button class="eb-icon-btn queue-button"><img
+                                                        src="{% static '/images/queue_icon.png' %}" alt="queue symbol"
+                                                        class="icon-member"></button></div>
+                                            <div><button class="eb-icon-btn">
+                                                    <div class="star-elem-div"><span
+                                                            class="fa fa-star star-elem-2"></span>
+                                                    </div>
+                                                </button></div>
+                                            <div><button class="eb-icon-btn"><img
+                                                        src="{% static '/images/trash_icon.png' %}" alt="delete symbol"
+                                                        class="icon-member trash-icon"></button></div>
+                                        </div>
+                                        <div class="eb-buttons">
+                                            <button class="button-edit-bar play-playlist-btn">play</button>
+                                            <button class="button-edit-bar">edit</button>
+                                            <button class="button-edit-bar">view</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="outer-grid outer-grid-2">
-                                <div class="album-cover-grid">
-                                    <div class="cover-img-div"><img src="{{ playlist.images.0 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.1 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.2 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.3 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.4 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.5 }}"
-                                            class="album-cover-member"></div>
-                                    <div class="album-cover-member acm-div"></div>
-                                    <div class="album-cover-member acm-div"></div>
-                                    <div class="cover-img-div"><img src="{{ playlist.images.6 }}"
-                                            class="album-cover-member"></div>
+                                <div class="outer-grid outer-grid-2">
+                                    <div class="album-cover-grid">
+                                        <div class="cover-img-div"><img src="{{ playlist.images.0 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.1 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.2 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.3 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.4 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.5 }}"
+                                                class="album-cover-member"></div>
+                                        <div class="album-cover-member acm-div"></div>
+                                        <div class="album-cover-member acm-div"></div>
+                                        <div class="cover-img-div"><img src="{{ playlist.images.6 }}"
+                                                class="album-cover-member"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         </div>
                         {% endfor %}
 
@@ -274,6 +277,55 @@
         </div>
 
     </div>
+
+    <script>
+
+        function play_playlist(playlistId) {
+            fetch('/play_playlist/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    playlist_id: playlistId
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                    } else {
+                        // Handle errors if any
+                        console.error('Error playing the playlist');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+
+        function add_playlist_to_queue(playlistId) {
+            fetch('/queue_playlist/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    playlist_id: playlistId
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                    } else {
+                        console.error('Error queueing the playlist');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+    </script>
+
 </body>
 
 </html>

@@ -435,7 +435,7 @@ body {
 
 .child-playlist-options-mini-player-add-playlists {
     height: calc(100vh - 4rem);
-    width: 25vw;
+    width: 22vw;
     display: grid;
     grid-template-rows: 2.1fr 3.25fr;
     border-right: solid black 2px;
@@ -459,7 +459,7 @@ body {
 .add-playlist-header-bar {
     display: flex;
     justify-content: space-between;
-    width: 75vw;
+    width: 78vw;
 }
 
 .add-playlist-h-desc {

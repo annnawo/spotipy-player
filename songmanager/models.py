@@ -73,3 +73,47 @@ class Folder(models.Model):
     name = models.CharField(max_length=100, null=False)
     playlists = models.ManyToManyField(Playlist, blank=True)
     smart_folder = models.BooleanField(default=False, null=False)
+    
+class RuleModifierChoices(Enum):
+    LESS_THAN = 'lt'
+    LESS_THAN_EQUAL_TO = 'lteq'
+    EQUAL_TO  = 'eq'
+    GREATER_THAN_EQUAL_TO = 'gteq'
+    GREATER_THAN = 'gt'
+    
+class RuleJoinChoices(Enum):
+    AND = 'and'
+    OR = 'or'
+
+class RuleModifierContainChoices(Enum):
+    CONTAINS = 'contains'
+    DOES_NOT_CONTAIN = 'dncontain'
+
+class RuleModifierOptionsChoices(Enum):
+    ALL_OPTIONS = 'alloptions'
+    AT_LEAST_ONE_OPTION = 'oneoption'
+
+class SmartPlaylistRules(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE)
+    rating_modifier = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleModifierChoices], null=True)
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)], null=True, blank=True)
+    rating_energy_join = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleJoinChoices], null=True)
+    energy_modifier = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleModifierChoices], null=True)
+    energy = models.IntegerField(choices=[(i, i) for i in range(0, 101)], null=True, blank=True)
+    genre_join = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleJoinChoices], null=True)
+    genre_contain_choice = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleModifierContainChoices], null=True)
+    genre_options_choice = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleModifierContainChoices], null=True)
+    genres = models.ManyToManyField(Genre)
+    atmosphere_join = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleJoinChoices], null=True)
+    atmosphere_contain_choice = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleModifierContainChoices], null=True)
+    atmosphere_options_choice = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleModifierContainChoices], null=True)
+    atmospheres = models.ManyToManyField(Atmosphere, blank=True)
+    emotion_join = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleJoinChoices], null=True)
+    emotion_contain_choice = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleModifierContainChoices], null=True)
+    emotion_options_choice = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleModifierContainChoices], null=True)
+    emotions = models.ManyToManyField(Emotion, blank=True)
+    tags_join = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleJoinChoices], null=True)
+    tags_contain_choice = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleModifierContainChoices], null=True)
+    tags_options_choice = models.CharField(max_length=30, choices=[(modifier.name, modifier.value) for modifier in RuleModifierContainChoices], null=True)
+    tags = models.ManyToManyField(Tag, blank=True)

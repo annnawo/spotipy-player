@@ -118,7 +118,7 @@
                                     <option value="lt">is less than</option>
                                     <option value="lteq">is less than or equal to</option>
                                     <option value="eq">is equal to</option>
-                                    <option value="lteq">is greater than or equal to</option>
+                                    <option value="gteq">is greater than or equal to</option>
                                     <option value="gt">is greater than</option>
                                 </select>
                                 <input type="number" id="sm-rating" name="sm-rating" min="0" max="100" step="1">
@@ -233,8 +233,8 @@
                                 </select>
                                 <select name="sm-tags-modifier-2" id="sm-tags-modifier-2">
                                     <option value="">--all/at least one of--</option>
-                                    <option value="contains">all option(s) for each song</option>
-                                    <option value="dncontain">one or more of the following options</option>
+                                    <option value="alloptions">all option(s) for each song</option>
+                                    <option value="oneoption">one or more of the following options</option>
                                 </select>
                                 :
                                 <select name="sm-tags-options-select" id="sm-tags-options-select">
@@ -250,7 +250,6 @@
                         </div>
 
                         <div class="ap-submit-add-name-bar">
-                            <button class="ap-sm-add-field">Add a Field</button>
                             <input type="text" id="sm-playlist-title" name="sm-playlist-title" placeholder="Enter a Playlist Name" required>
                             <input type="submit">
                         </div>

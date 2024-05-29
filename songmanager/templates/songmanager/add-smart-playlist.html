@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Smart Playlist</title>
+    <link rel="icon" type="image/x-icon" href="{% static '/images/favicon_star.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/playlists.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">window.CSRF_TOKEN = "{{ csrf_token }}";</script>
+    <script src="{% static '/js/add-smart-playlist.js' %}" defer></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css"
+        integrity="sha512-pTaEn+6gF1IeWv3W1+7X7eM60TFu/agjgoHmYhAfLEU8Phuf6JKiiE8YmsNC0aCgQv4192s4Vai8YZ6VNM6vyQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"
+        integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+    {% include 'songmanager/navbar.html' %}
+    <div class="wrapper-add-playlists">
+        <div class="child-playlist-options-mini-player-add-playlists">
+
+            <div class="add-playlists-container">
+
+                <div class="add-playlists-btn-group">
+                    <hr>
+                    <div class="add-playlists-btn-member back-to-playlists-btn"><a href="{% url 'playlists' %}">&lt;
+                            Back to
+                            Playlist Page</a></div>
+                    <hr>
+                </div>
+
+            </div>
+
+            <div class="mini-player-container">
+
+                <div class="mini-player-group">
+
+                    <div class="now-playing-song-description-group">
+                        <div class="album-art-container"><img src='{{ album_art }}' alt="Album Cover"
+                                class="pl-album-cover-art"></div>
+                        <h4 class="pl-song-title pl-song-txt">{{ song_name }}</h4>
+                        <h5 class="pl-album-name pl-song-txt">{{ album_name }}</h5>
+                        <h5 class="pl-artist-name pl-song-txt">{{ artist_name }}</h5>
+                    </div>
+
+                    <div class="pl-mini-player-controls-group">
+                        <div class=“pl-control-div”><img src="{% static '/images/skip_icon.png' %}"
+                                alt="Go back to the previous song icon" class="pl-control-img pl-prev-img"></div>
+                        {% if now_playing %}
+                        <div class="pl-control-div"><img src="{% static '/images/pause_icon.png' %}"
+                                alt="Play song icon" class="pl-control-img">
+                        </div>
+                        {% else %}
+                        <div class="pl-control-div"><img src="{% static '/images/play_icon.png' %}"
+                                alt="Pause song icon" class="pl-control-img"></div>
+                        {% endif %}
+                        <div class="pl-control-div"><img src="{% static '/images/skip_icon.png' %}" alt="Skip song icon"
+                                class="pl-control-img"></div>
+                    </div>
+
+                    <div class="pl-add-song-option-group">
+                        <div><button class="pl-add-song-btn-member">Add to Library</button></div>
+                        <div class="pl-og-add-song-div"><button class="pl-add-song-btn-member">Add to Playlist</button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="main-block-content-add-playlists">
+            <div class="add-playlist-header-bar">
+                <div class="add-playlist-header">
+                    <h1 class="add-playlist-opt-header">Set Playlist Rules</h1>
+                    <hr class="playlist-rules-header-hr">
+                </div>
+                <div class="add-playlist-h-desc">
+                    <p>Songs in your library that match these rules will automatically be added to the playlist. Fields
+                        can be left blank.</p>
+                </div>
+            </div>
+
+            <div class="add-playlist-form">
+                <div class="add-playlist-form-body">
+                    <form method="POST">
+
+                        <div class="ap-rating-energy-choices-div ap-choices-line">
+                            <div class="ap-rating-choice-div">
+                                <span>Rating</span>
+                                <select name="sm-rating-modifier" id="sm-rating-modifier">
+                                    <option value="">&lt;/=/&gt;</option>
+                                    <option value="lt">is less than</option>
+                                    <option value="lteq">is less than or equal to</option>
+                                    <option value="eq">is equal to</option>
+                                    <option value="lteq">is greater than or equal to</option>
+                                    <option value="gt">is greater than</option>
+                                </select>
+                                <input type="number" id="sm-rating" name="sm-rating" min="1" max="5" step="1">
+                            </div>
+                            <select name="sm-rating-energy-join" id="sm-rating-energy-join">
+                                <option value="">and/or</option>
+                                <option value="and">and</option>
+                                <option value="or">or</option>
+                            </select>
+                            <div class="ap-energy-choice-div">
+                                <span>Energy</span>
+                                <select name="sm-energy-modifier" id="sm-energy-modifier">
+                                    <option value="">&lt;/=/&gt;</option>
+                                    <option value="lt">is less than</option>
+                                    <option value="lteq">is less than or equal to</option>
+                                    <option value="eq">is equal to</option>
+                                    <option value="lteq">is greater than or equal to</option>
+                                    <option value="gt">is greater than</option>
+                                </select>
+                                <input type="number" id="sm-rating" name="sm-rating" min="0" max="100" step="1">
+                            </div>
+                        </div>
+
+                        <div class="ap-genre-choices-line ap-choices-line">
+                            <select name="sm-genre-join" id="sm-genre-join">
+                                <option value="">and/or</option>
+                                <option value="and">and</option>
+                                <option value="or">or</option>
+                            </select>
+                            <div class="ap-genre-choice-div">
+                                <span>Genre</span>
+                                <select name="sm-genre-modifier-1" id="sm-genre-modifier-1">
+                                    <option value="">--contains/does not contain--</option>
+                                    <option value="contains">contains</option>
+                                    <option value="dncontain">does not contain</option>
+                                </select>
+                                <select name="sm-genre-modifier-2" id="sm-genre-modifier-2">
+                                    <option value="">--all/at least one of--</option>
+                                    <option value="contains">all option(s) for each song</option>
+                                    <option value="dncontain">one or more of the following options</option>
+                                </select>
+                                :
+                                <select name="sm-genre-options-select" id="sm-genre-options-select">
+                                    <option value="">--Please Select--</option>
+                                    {% for genre in genres %}
+                                    <option value='{{ genre.name }}'>{{ genre.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <script>
+                                    $('#sm-genre-options-select').selectize({ maxItems: null })
+                                </script>
+                            </div>
+                        </div>
+
+                        <div class="ap-atmosphere-choices-line ap-choices-line">
+                            <select name="sm-atmosphere-join" id="sm-atmosphere-join">
+                                <option value="">and/or</option>
+                                <option value="and">and</option>
+                                <option value="or">or</option>
+                            </select>
+                            <div class="ap-atmosphere-choice-div">
+                                <span>Atmosphere</span>
+                                <select name="sm-atmosphere-modifier-1" id="sm-atmosphere-modifier-1">
+                                    <option value="">--contains/does not contain--</option>
+                                    <option value="contains">contains</option>
+                                    <option value="dncontain">does not contain</option>
+                                </select>
+                                <select name="sm-atmosphere-modifier-2" id="sm-atmosphere-modifier-2">
+                                    <option value="">--all/at least one of--</option>
+                                    <option value="contains">all option(s) for each song</option>
+                                    <option value="dncontain">one or more of the following options</option>
+                                </select>
+                                :
+                                <select name="sm-atmosphere-options-select" id="sm-atmosphere-options-select">
+                                    <option value="">--Please Select--</option>
+                                    {% for atmosphere in atmospheres %}
+                                    <option value='{{ atmosphere.atmosphere }}'>{{ atmosphere.atmosphere }}</option>
+                                    {% endfor %}
+                                </select>
+                                <script>
+                                    $('#sm-atmosphere-options-select').selectize({ maxItems: null })
+                                </script>
+                            </div>
+                        </div>
+
+                        <div class="ap-emotion-choices-line ap-choices-line">
+                            <select name="sm-emotion-join" id="sm-emotion-join">
+                                <option value="">and/or</option>
+                                <option value="and">and</option>
+                                <option value="or">or</option>
+                            </select>
+                            <div class="ap-emotion-choice-div">
+                                <span>Emotion</span>
+                                <select name="sm-emotion-modifier-1" id="sm-emotion-modifier-1">
+                                    <option value="">--contains/does not contain--</option>
+                                    <option value="contains">contains</option>
+                                    <option value="dncontain">does not contain</option>
+                                </select>
+                                <select name="sm-emotion-modifier-2" id="sm-emotion-modifier-2">
+                                    <option value="">--all/at least one of--</option>
+                                    <option value="contains">all option(s) for each song</option>
+                                    <option value="dncontain">one or more of the following options</option>
+                                </select>
+                                :
+                                <select name="sm-emotion-options-select" id="sm-emotion-options-select">
+                                    <option value="">--Please Select--</option>
+                                    {% for emotion in emotions %}
+                                    <option value='{{ emotion.emotion }}'>{{ emotion.emotion }}</option>
+                                    {% endfor %}
+                                </select>
+                                <script>
+                                    $('#sm-emotion-options-select').selectize({ maxItems: null })
+                                </script>
+                            </div>
+                        </div>
+
+                        <div class="ap-tags-choices-line ap-choices-line">
+                            <select name="sm-tags-join" id="sm-tags-join">
+                                <option value="">and/or</option>
+                                <option value="and">and</option>
+                                <option value="or">or</option>
+                            </select>
+                            <div class="ap-tags-choice-div">
+                                <span>Tags</span>
+                                <select name="sm-tags-modifier-1" id="sm-tags-modifier-1">
+                                    <option value="">--contains/does not contain--</option>
+                                    <option value="contains">contains</option>
+                                    <option value="dncontain">does not contain</option>
+                                </select>
+                                <select name="sm-tags-modifier-2" id="sm-tags-modifier-2">
+                                    <option value="">--all/at least one of--</option>
+                                    <option value="contains">all option(s) for each song</option>
+                                    <option value="dncontain">one or more of the following options</option>
+                                </select>
+                                :
+                                <select name="sm-tags-options-select" id="sm-tags-options-select">
+                                    <option value="">--Please Select--</option>
+                                    {% for tag in tags %}
+                                    <option value='{{ tag.tag }}'>{{ tag.tag }}</option>
+                                    {% endfor %}
+                                </select>
+                                <script>
+                                    $('#sm-tags-options-select').selectize({ maxItems: null })
+                                </script>
+                            </div>
+                        </div>
+
+                        <div class="ap-submit-add-name-bar">
+                            <button class="ap-sm-add-field">Add a Field</button>
+                            <input type="text" id="sm-playlist-title" name="sm-playlist-title" placeholder="Enter a Playlist Name" required>
+                            <input type="submit">
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

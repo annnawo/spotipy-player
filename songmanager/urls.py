@@ -36,5 +36,8 @@ urlpatterns = [
     path('play_playlist/', views.play_playlist, name='play_playlist'),
     path('queue_playlist/', views.queue_playlist, name='queue_playlist'),
     
+    path('add-smart-playlist/', views.add_smart_playlist, name='add_smart_playlist'),
+    
+    
     
 ]

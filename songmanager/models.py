@@ -12,6 +12,11 @@ class User(models.Model):
     def __str__(self):
         return self.name
     
+    def get_genres(self):
+        user_songs = UserSong.objects.filter(user=self)
+        genres = Genre.objects.filter(song__usersong__in=user_songs).distinct()
+        return genres
+    
 class Genre(models.Model):
     name = models.CharField(max_length=200, null=False)
     

@@ -92,71 +92,36 @@
             <div class="add-playlist-form">
                 <div class="add-playlist-form-body">
                     <form method="POST">
-
+                        {% csrf_token %}               
                         <div class="ap-rating-energy-choices-div ap-choices-line">
                             <div class="ap-rating-choice-div">
                                 <span>Rating</span>
-                                <select name="sm-rating-modifier" id="sm-rating-modifier">
-                                    <option value="">&lt;/=/&gt;</option>
-                                    <option value="lt">is less than</option>
-                                    <option value="lteq">is less than or equal to</option>
-                                    <option value="eq">is equal to</option>
-                                    <option value="lteq">is greater than or equal to</option>
-                                    <option value="gt">is greater than</option>
-                                </select>
-                                <input type="number" id="sm-rating" name="sm-rating" min="1" max="5" step="1">
+                                {{ form.sm_rating_modifier }}
+                                {{ form.sm_rating }}
                             </div>
-                            <select name="sm-rating-energy-join" id="sm-rating-energy-join">
-                                <option value="">and/or</option>
-                                <option value="and">and</option>
-                                <option value="or">or</option>
-                            </select>
+                            {{ form.sm_rating_energy_join }}
                             <div class="ap-energy-choice-div">
                                 <span>Energy</span>
-                                <select name="sm-energy-modifier" id="sm-energy-modifier">
-                                    <option value="">&lt;/=/&gt;</option>
-                                    <option value="lt">is less than</option>
-                                    <option value="lteq">is less than or equal to</option>
-                                    <option value="eq">is equal to</option>
-                                    <option value="gteq">is greater than or equal to</option>
-                                    <option value="gt">is greater than</option>
-                                </select>
-                                <input type="number" id="sm-rating" name="sm-rating" min="0" max="100" step="1">
+                                {{ form.sm_energy_modifier }}
+                                {{ form.sm_energy }}
                             </div>
                         </div>
 
                         <div class="ap-genre-choices-line ap-choices-line">
-                            <select name="sm-genre-join" id="sm-genre-join">
-                                <option value="">and/or</option>
-                                <option value="and">and</option>
-                                <option value="or">or</option>
-                            </select>
+                            {{ form.sm_genre_join }}
                             <div class="ap-genre-choice-div">
                                 <span>Genre</span>
-                                <select name="sm-genre-modifier-1" id="sm-genre-modifier-1">
-                                    <option value="">--contains/does not contain--</option>
-                                    <option value="contains">contains</option>
-                                    <option value="dncontain">does not contain</option>
-                                </select>
-                                <select name="sm-genre-modifier-2" id="sm-genre-modifier-2">
-                                    <option value="">--all/at least one of--</option>
-                                    <option value="contains">all option(s) for each song</option>
-                                    <option value="dncontain">one or more of the following options</option>
-                                </select>
+                                {{ form.sm_genre_modifier_1 }}
+                                {{ form.sm_genre_modifier_2 }}
                                 :
-                                <select name="sm-genre-options-select" id="sm-genre-options-select">
-                                    <option value="">--Please Select--</option>
-                                    {% for genre in genres %}
-                                    <option value='{{ genre.name }}'>{{ genre.name }}</option>
-                                    {% endfor %}
-                                </select>
-                                <script>
-                                    $('#sm-genre-options-select').selectize({ maxItems: null })
-                                </script>
+                                {{ form.sm_genre_options_select }}
                             </div>
                         </div>
+                        <script>
+                            $('#sm-genre-options-select').selectize({ maxItems: null })
+                        </script>
 
-                        <div class="ap-atmosphere-choices-line ap-choices-line">
+                        <!-- <div class="ap-atmosphere-choices-line ap-choices-line">
                             <select name="sm-atmosphere-join" id="sm-atmosphere-join">
                                 <option value="">and/or</option>
                                 <option value="and">and</option>
@@ -247,14 +212,16 @@
                                     $('#sm-tags-options-select').selectize({ maxItems: null })
                                 </script>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="ap-submit-add-name-bar">
-                            <input type="text" id="sm-playlist-title" name="sm-playlist-title" placeholder="Enter a Playlist Name" required>
+                            {{ form.sm_playlist_title }}
                             <input type="submit">
                         </div>
 
                     </form>
+
+
                 </div>
             </div>
 

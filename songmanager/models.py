@@ -20,6 +20,9 @@ class User(models.Model):
 class Genre(models.Model):
     name = models.CharField(max_length=200, null=False)
     
+    def __str__(self):
+        return self.name
+    
 class Album(models.Model):
     name = models.CharField(max_length=200, null=False)
     artist = models.CharField(max_length=200, null=False)

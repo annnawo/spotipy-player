@@ -17,6 +17,10 @@ class User(models.Model):
         genres = Genre.objects.filter(song__usersong__in=user_songs).distinct()
         return genres
     
+    def get_tags(self):
+        tags = Tag.objects.filter(author=self)
+        return tags
+    
 class Genre(models.Model):
     name = models.CharField(max_length=200, null=False)
     
@@ -51,12 +55,21 @@ class Playlist(models.Model):
 class Emotion(models.Model):
     emotion = models.CharField(max_length=100)  
     
+    def __str__(self):
+        return self.emotion
+    
 class Atmosphere(models.Model):
     atmosphere = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.atmosphere
     
 class Tag(models.Model):
     tag = models.CharField(max_length=20)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.tag
 
 class UserSong(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

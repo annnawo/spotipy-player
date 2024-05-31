@@ -73,18 +73,19 @@ class CombinedForm(forms.Form):
         required=False,
         widget=forms.NumberInput(attrs={'id': 'sm-energy', 'class': 'form-control'})
     )
+    # 
     sm_genre_join = forms.ChoiceField(
         choices=[('', 'and/or'), ('and', 'and'), ('or', 'or')],
         required=False,
         widget=forms.Select(attrs={'id': 'sm-genre-join', 'class': 'form-control'})
     )
     sm_genre_modifier_1 = forms.ChoiceField(
-        choices=[('', '--contains/does not contain--'), ('contains', 'contains'), ('dncontain', 'does not contain')],
+        choices=[('', 'contains/does not contain'), ('contains', 'contains'), ('dncontain', 'does not contain')],
         required=False,
         widget=forms.Select(attrs={'id': 'sm-genre-modifier-1', 'class': 'form-control'})
     )
     sm_genre_modifier_2 = forms.ChoiceField(
-        choices=[('', '--all/at least one of--'), ('all', 'all option(s) for each song'), ('one', 'one or more of the following options')],
+        choices=[('', 'all/at least one of'), ('all', 'all option(s) for each song'), ('one', 'one or more of the following options')],
         required=False,
         widget=forms.Select(attrs={'id': 'sm-genre-modifier-2', 'class': 'form-control'})
     )
@@ -93,10 +94,134 @@ class CombinedForm(forms.Form):
         required=False,
         widget=forms.SelectMultiple(attrs={'id': 'sm-genre-options-select', 'class': 'form-control'})
     )
-
+    # 
+    sm_atmosphere_join = forms.ChoiceField(
+        choices=[('', 'and/or'), ('and', 'and'), ('or', 'or')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'sm-atmosphere-join', 'class': 'form-control'})
+    )
+    sm_atmosphere_modifier_1 = forms.ChoiceField(
+        choices=[('', 'contains/does not contain'), ('contains', 'contains'), ('dncontain', 'does not contain')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'sm-atmosphere-modifier-1', 'class': 'form-control'})
+    )
+    sm_atmosphere_modifier_2 = forms.ChoiceField(
+        choices=[('', 'all/at least one of'), ('all', 'all option(s) for each song'), ('one', 'one or more of the following options')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'sm-atmosphere-modifier-2', 'class': 'form-control'})
+    )
+    sm_atmosphere_options_select = forms.ModelMultipleChoiceField(
+        queryset=Atmosphere.objects.all(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={'id': 'sm-atmosphere-options-select', 'class': 'form-control'})
+    )
+    # 
+    sm_emotion_join = forms.ChoiceField(
+        choices=[('', 'and/or'), ('and', 'and'), ('or', 'or')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'sm-emotion-join', 'class': 'form-control'})
+    )
+    sm_emotion_modifier_1 = forms.ChoiceField(
+        choices=[('', 'contains/does not contain'), ('contains', 'contains'), ('dncontain', 'does not contain')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'sm-emotion-modifier-1', 'class': 'form-control'})
+    )
+    sm_emotion_modifier_2 = forms.ChoiceField(
+        choices=[('', 'all/at least one of'), ('all', 'all option(s) for each song'), ('one', 'one or more of the following options')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'sm-emotion-modifier-2', 'class': 'form-control'})
+    )
+    sm_emotion_options_select = forms.ModelMultipleChoiceField(
+        queryset=Emotion.objects.all(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={'id': 'sm-emotion-options-select', 'class': 'form-control'})
+    )
+    # 
+    sm_tag_join = forms.ChoiceField(
+        choices=[('', 'and/or'), ('and', 'and'), ('or', 'or')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'sm-tag-join', 'class': 'form-control'})
+    )
+    sm_tag_modifier_1 = forms.ChoiceField(
+        choices=[('', 'contains/does not contain'), ('contains', 'contains'), ('dncontain', 'does not contain')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'sm-tag-modifier-1', 'class': 'form-control'})
+    )
+    sm_tag_modifier_2 = forms.ChoiceField(
+        choices=[('', 'all/at least one of'), ('all', 'all option(s) for each song'), ('one', 'one or more of the following options')],
+        required=False,
+        widget=forms.Select(attrs={'id': 'sm-tag-modifier-2', 'class': 'form-control'})
+    )
+    sm_tag_options_select = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.none(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={'id': 'sm-tag-options-select', 'class': 'form-control'})
+    )
+    
     
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super(CombinedForm, self).__init__(*args, **kwargs)
         if user:
             self.fields['sm_genre_options_select'].queryset = user.get_genres()
+            self.fields['sm_tag_options_select'].queryset = user.get_tags()
+            
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # Field validation
+        # If one selected field requires another in a complete ruleset (e.g. a rating comparison operator and integer representing the rating), this ensures both are in the submitted version of the form        
+        rating = cleaned_data.get('sm_rating')
+        rating_modifier = cleaned_data.get('sm_rating_modifier')
+        rating_energy_join = cleaned_data.get('sm_rating_energy_join')
+        energy = cleaned_data.get('sm_energy')
+        energy_modifier = cleaned_data.get('sm_energy_modifier')
+        
+        genre = cleaned_data.get('sm_genre_options_select')
+        genre_join = cleaned_data.get('sm_genre_join')
+        genre_modifier_1 = cleaned_data.get('sm_genre_modifier_1')
+        genre_modifier_2 = cleaned_data.get('sm_genre_modifier_2')
+        
+        atmosphere = cleaned_data.get('sm_atmosphere_options_select')
+        atmosphere_join = cleaned_data.get('sm_atmosphere_join')
+        atmosphere_modifier_1 = cleaned_data.get('sm_atmosphere_modifier_1')
+        atmosphere_modifier_2 = cleaned_data.get('sm_atmosphere_modifier_2')
+        
+        emotion = cleaned_data.get('sm_emotion_options_select')
+        emotion_join = cleaned_data.get('sm_emotion_join')
+        emotion_modifier_1 = cleaned_data.get('sm_emotion_modifier_1')
+        emotion_modifier_2 = cleaned_data.get('sm_emotion_modifier_2')
+        
+        tag = cleaned_data.get('sm_tag_options_select')
+        tag_join = cleaned_data.get('sm_tag_join')
+        tag_modifier_1 = cleaned_data.get('sm_tag_modifier_1')
+        tag_modifier_2 = cleaned_data.get('sm_tag_modifier_2')
+        
+        if genre or genre_modifier_1 or genre_modifier_2:
+            if not genre_modifier_1 or genre_modifier_1 == '' or not genre_modifier_2 or genre_modifier_2 == '' or not genre_join or genre_join == '' or not genre or genre == '':
+                self.add_error('sm_genre_modifier_1', 'All genre fields are required if a genre is selected.') 
+
+        if rating or rating_modifier:
+            if not rating_modifier or rating_modifier == '' or not rating or rating == '':
+                self.add_error('sm_rating', 'All rating fields are required if a rating is selected.') 
+            if energy or energy_modifier:
+                if not rating_energy_join or rating_energy_join == '':
+                    self.add_error('sm_rating', "Selecting 'and' or 'or' is required if both rating and energy are included.") 
+        
+        if energy or energy_modifier:
+            if not energy_modifier or energy_modifier == '' or not energy or energy == '':
+                self.add_error('sm_rating', 'All energy fields are required if one energy field is selected.') 
+
+        if atmosphere or atmosphere_modifier_1 or atmosphere_modifier_2:
+            if not atmosphere_modifier_1 or atmosphere_modifier_1 == '' or not atmosphere_modifier_2 or atmosphere_modifier_2 == '' or not atmosphere_join or atmosphere_join == '' or not atmosphere or atmosphere == '':
+                self.add_error('sm_atmosphere_options_select', 'All atmosphere fields are required if one atmosphere field is selected.')
+        
+        if emotion or emotion_modifier_1 or emotion_modifier_2:
+            if not emotion_modifier_1 or emotion_modifier_1 == '' or not emotion_modifier_2 or emotion_modifier_2 == '' or not emotion_join or emotion_join == '' or not emotion or emotion == '':
+                self.add_error('sm_atmosphere_options_select', 'All emotion fields are required if one emotion field is selected.')
+
+        if tag or tag_modifier_1 or tag_modifier_2:
+            if not tag_modifier_1 or tag_modifier_1 == '' or not tag_modifier_2 or tag_modifier_2 == '' or not tag_join or tag_join == '' or not tag or tag == '':
+                self.add_error('sm_atmosphere_options_select', 'All tag fields are required if one tag field is selected.')
+
+        return cleaned_data

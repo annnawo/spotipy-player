@@ -92,131 +92,122 @@
             <div class="add-playlist-form">
                 <div class="add-playlist-form-body">
                     <form method="POST">
-                        {% csrf_token %}               
-                        <div class="ap-rating-energy-choices-div ap-choices-line">
-                            <div class="ap-rating-choice-div">
-                                <span>Rating</span>
+                        {% csrf_token %}
+                        <div class="ap-rating-energy-choices-div">
+                            <div class="ap-rating-choice-div ap-choice-div-sub">
+                                <h5 class="rule-choice-subhead">Rating</h5>
                                 {{ form.sm_rating_modifier }}
                                 {{ form.sm_rating }}
                             </div>
-                            {{ form.sm_rating_energy_join }}
-                            <div class="ap-energy-choice-div">
-                                <span>Energy</span>
+                            <div class="sm-join-re">
+                                {{ form.sm_rating_energy_join }}
+                            </div>
+                            <div class="ap-energy-choice-div ap-choice-div-sub">
+                                <h5 class="rule-choice-subhead">Energy</h5>
                                 {{ form.sm_energy_modifier }}
                                 {{ form.sm_energy }}
                             </div>
                         </div>
+                        {% if form.sm_rating.errors %}
+                        <div class="sm-form-error">{{ form.sm_rating.errors }}</div>
+                        {% endif %}
+                        <script>
+                            $('#sm-rating-energy-join').selectize()
+                            $('#sm-rating-modifier').selectize()
+                            $('#sm-energy-modifier').selectize()
+                        </script>
 
                         <div class="ap-genre-choices-line ap-choices-line">
-                            {{ form.sm_genre_join }}
+                            <div class="sm-join">
+                                {{ form.sm_genre_join }}
+                            </div>
                             <div class="ap-genre-choice-div">
-                                <span>Genre</span>
-                                {{ form.sm_genre_modifier_1 }}
-                                {{ form.sm_genre_modifier_2 }}
+                                <h5 class="rule-choice-subhead">Genre</h5>
+                                <div class="sm-options-select">{{ form.sm_genre_modifier_1 }}</div>
+                                <div class="sm-options-select">{{ form.sm_genre_modifier_2 }}</div>
                                 :
-                                {{ form.sm_genre_options_select }}
+                                <div class="sm-options-select">{{ form.sm_genre_options_select }}</div>
                             </div>
                         </div>
+                        {% if form.sm_genre_modifier_1.errors %}
+                        <div class="sm-form-error">{{ form.sm_genre_modifier_1.errors }}</div>
+                        {% endif %}
                         <script>
+                            $('#sm-genre-join').selectize()
+                            $('#sm-genre-modifier-1').selectize()
+                            $('#sm-genre-modifier-2').selectize()
                             $('#sm-genre-options-select').selectize({ maxItems: null })
                         </script>
 
-                        <!-- <div class="ap-atmosphere-choices-line ap-choices-line">
-                            <select name="sm-atmosphere-join" id="sm-atmosphere-join">
-                                <option value="">and/or</option>
-                                <option value="and">and</option>
-                                <option value="or">or</option>
-                            </select>
+                        <div class="ap-atmosphere-choices-line ap-choices-line">
+                            <div class="sm-join">
+                                {{ form.sm_atmosphere_join }}
+                            </div>
                             <div class="ap-atmosphere-choice-div">
-                                <span>Atmosphere</span>
-                                <select name="sm-atmosphere-modifier-1" id="sm-atmosphere-modifier-1">
-                                    <option value="">--contains/does not contain--</option>
-                                    <option value="contains">contains</option>
-                                    <option value="dncontain">does not contain</option>
-                                </select>
-                                <select name="sm-atmosphere-modifier-2" id="sm-atmosphere-modifier-2">
-                                    <option value="">--all/at least one of--</option>
-                                    <option value="contains">all option(s) for each song</option>
-                                    <option value="dncontain">one or more of the following options</option>
-                                </select>
+                                <h5 class="rule-choice-subhead">Atmosphere</h5>
+                                <div class="sm-options-select">{{ form.sm_atmosphere_modifier_1 }}</div>
+                                <div class="sm-options-select">{{ form.sm_atmosphere_modifier_2 }}</div>
                                 :
-                                <select name="sm-atmosphere-options-select" id="sm-atmosphere-options-select">
-                                    <option value="">--Please Select--</option>
-                                    {% for atmosphere in atmospheres %}
-                                    <option value='{{ atmosphere.atmosphere }}'>{{ atmosphere.atmosphere }}</option>
-                                    {% endfor %}
-                                </select>
-                                <script>
-                                    $('#sm-atmosphere-options-select').selectize({ maxItems: null })
-                                </script>
+                                <div class="sm-options-select">{{ form.sm_atmosphere_options_select }}</div>
                             </div>
                         </div>
+                        {% if form.sm_atmosphere_options_select.errors %}
+                        <div class="sm-form-error">{{ form.sm_atmosphere_options_select.errors }}</div>
+                        {% endif %}
+                        <script>
+                            $('#sm-atmosphere-join').selectize()
+                            $('#sm-atmosphere-modifier-1').selectize()
+                            $('#sm-atmosphere-modifier-2').selectize()
+                            $('#sm-atmosphere-options-select').selectize({ maxItems: null })
+                        </script>
 
                         <div class="ap-emotion-choices-line ap-choices-line">
-                            <select name="sm-emotion-join" id="sm-emotion-join">
-                                <option value="">and/or</option>
-                                <option value="and">and</option>
-                                <option value="or">or</option>
-                            </select>
+                            <div class="sm-join">
+                                {{ form.sm_emotion_join }}
+                            </div>
                             <div class="ap-emotion-choice-div">
-                                <span>Emotion</span>
-                                <select name="sm-emotion-modifier-1" id="sm-emotion-modifier-1">
-                                    <option value="">--contains/does not contain--</option>
-                                    <option value="contains">contains</option>
-                                    <option value="dncontain">does not contain</option>
-                                </select>
-                                <select name="sm-emotion-modifier-2" id="sm-emotion-modifier-2">
-                                    <option value="">--all/at least one of--</option>
-                                    <option value="contains">all option(s) for each song</option>
-                                    <option value="dncontain">one or more of the following options</option>
-                                </select>
+                                <h5 class="rule-choice-subhead">Emotion</h5>
+                                <div class="sm-options-select">{{ form.sm_emotion_modifier_1 }}</div>
+                                <div class="sm-options-select">{{ form.sm_emotion_modifier_2 }}</div>
                                 :
-                                <select name="sm-emotion-options-select" id="sm-emotion-options-select">
-                                    <option value="">--Please Select--</option>
-                                    {% for emotion in emotions %}
-                                    <option value='{{ emotion.emotion }}'>{{ emotion.emotion }}</option>
-                                    {% endfor %}
-                                </select>
-                                <script>
-                                    $('#sm-emotion-options-select').selectize({ maxItems: null })
-                                </script>
+                                <div class="sm-options-select">{{ form.sm_emotion_options_select }}</div>
                             </div>
                         </div>
+                        {% if form.sm_emotion_options_select.errors %}
+                        <div class="sm-form-error">{{ form.sm_emotion_options_select.errors }}</div>
+                        {% endif %}
+                        <script>
+                            $('#sm-emotion-join').selectize()
+                            $('#sm-emotion-modifier-1').selectize()
+                            $('#sm-emotion-modifier-2').selectize()
+                            $('#sm-emotion-options-select').selectize({ maxItems: null })
+                        </script>
 
-                        <div class="ap-tags-choices-line ap-choices-line">
-                            <select name="sm-tags-join" id="sm-tags-join">
-                                <option value="">and/or</option>
-                                <option value="and">and</option>
-                                <option value="or">or</option>
-                            </select>
-                            <div class="ap-tags-choice-div">
-                                <span>Tags</span>
-                                <select name="sm-tags-modifier-1" id="sm-tags-modifier-1">
-                                    <option value="">--contains/does not contain--</option>
-                                    <option value="contains">contains</option>
-                                    <option value="dncontain">does not contain</option>
-                                </select>
-                                <select name="sm-tags-modifier-2" id="sm-tags-modifier-2">
-                                    <option value="">--all/at least one of--</option>
-                                    <option value="alloptions">all option(s) for each song</option>
-                                    <option value="oneoption">one or more of the following options</option>
-                                </select>
-                                :
-                                <select name="sm-tags-options-select" id="sm-tags-options-select">
-                                    <option value="">--Please Select--</option>
-                                    {% for tag in tags %}
-                                    <option value='{{ tag.tag }}'>{{ tag.tag }}</option>
-                                    {% endfor %}
-                                </select>
-                                <script>
-                                    $('#sm-tags-options-select').selectize({ maxItems: null })
-                                </script>
+                        <div class="ap-tag-choices-line ap-choices-line">
+                            <div class="sm-join">
+                                {{ form.sm_tag_join }}
                             </div>
-                        </div> -->
+                            <div class="ap-tag-choice-div">
+                                <h5 class="rule-choice-subhead">Tag</h5>
+                                <div class="sm-options-select">{{ form.sm_tag_modifier_1 }}</div>
+                                <div class="sm-options-select">{{ form.sm_tag_modifier_2 }}</div>
+                                :
+                                <div class="sm-options-select">{{ form.sm_tag_options_select }}</div>
+                            </div>
+                        </div>
+                        {% if form.sm_emotion_options_select.errors %}
+                        <div class="sm-form-error">{{ form.sm_emotion_options_select.errors }}</div>
+                        {% endif %}
+                        <script>
+                            $('#sm-tag-join').selectize()
+                            $('#sm-tag-modifier-1').selectize()
+                            $('#sm-tag-modifier-2').selectize()
+                            $('#sm-tag-options-select').selectize({ maxItems: null })
+                        </script>
 
                         <div class="ap-submit-add-name-bar">
                             {{ form.sm_playlist_title }}
-                            <input type="submit">
+                            <input type="submit" class="sm-submit-btn">
                         </div>
 
                     </form>

@@ -51,7 +51,9 @@ h3 {
 .navbar {
     height: 4rem;
     background-color: black;
-    /* margin-bottom: 1rem; */
+    width: 100vw;
+    position: fixed;
+    /* margin-bottom: 4rem; */
 }
 .navbar-position {
     display: flex;
@@ -694,3 +696,5 @@ h3 {
     display: flex;
 }
  */
+
+ 

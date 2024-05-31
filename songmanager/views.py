@@ -725,7 +725,14 @@ def playlists_view(request):
     standard_playlists = get_standard_playlists()
     smart_folders = get_smart_folders()
     standard_folders = get_standard_folders()
-    
+    extra_smart_divs = (((len(smart_playlists)) + (len(smart_folders))) % 4)
+    if extra_smart_divs != 0:
+        extra_smart_divs = 4 - extra_smart_divs
+    extra_std_divs = (((len(standard_playlists)) + (len(standard_folders))) % 4)
+    if extra_std_divs != 0:
+        extra_std_divs = 4 - extra_std_divs
+    print(extra_smart_divs)
+    print(extra_std_divs)
 
     # Extract relevant information from the response
     if current_track is not None and 'item' in current_track and current_track['item']['name'] != "":
@@ -746,7 +753,7 @@ def playlists_view(request):
             user_song.last_played = datetime.now(timezone.utc)
             user_song.save()
             
-        return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name, 'album_name': album_name, 'smart_playlists':smart_playlists, 'standard_playlists':standard_playlists, 'smart_folders':smart_folders, 'standard_folders':standard_folders})
+        return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name, 'album_name': album_name, 'smart_playlists':smart_playlists, 'standard_playlists':standard_playlists, 'smart_folders':smart_folders, 'standard_folders':standard_folders, 'extra_smart_divs':range(extra_smart_divs), 'extra_std_divs':range(extra_std_divs)})
     else: 
         # If there is no currently playing track, retrieve the most recently played track instead
         recent_tracks = sp.current_user_recently_played(limit=1)['items']
@@ -761,7 +768,7 @@ def playlists_view(request):
             track_id = recent_track['id']
             energy_level = get_energy_level(track_id=track_id)
             # Pass the information about the most recently played track to the template
-            return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name, 'album_name': album_name, 'smart_playlists':smart_playlists, 'standard_playlists':standard_playlists, 'smart_folders':smart_folders, 'standard_folders':standard_folders})
+            return render(request, 'songmanager/playlists.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name, 'album_name': album_name, 'smart_playlists':smart_playlists, 'standard_playlists':standard_playlists, 'smart_folders':smart_folders, 'standard_folders':standard_folders, 'extra_smart_divs':range(extra_smart_divs), 'extra_std_divs':range(extra_std_divs)})
         else:
             # If there are no recent tracks, return an error message to the template
             return render(request, 'songmanager/playlists.html', {'error_message': 'No song currently playing'})
@@ -856,6 +863,17 @@ def queue_playlist(request):
 
 def add_smart_playlist(request):
     current_user = User.objects.get(pk=1)
+    SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+    SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+    SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
+    username = "ye6bq7h7l9wnphebox5b1jgqu"
+    scope = "playlist-read-private playlist-modify-private playlist-modify-public user-library-read user-library-modify"
+    client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
+    sp = spotipy.Spotify(auth=token)
+    current_user_id = sp.current_user()['id']
+    
     if request.method == 'POST':
         form = CombinedForm(request.POST, user=current_user)
         if form.is_valid():
@@ -863,79 +881,103 @@ def add_smart_playlist(request):
             print(form.cleaned_data['sm_genre_join'])
             print(form.cleaned_data['sm_genre_modifier_1'])
             print(form.cleaned_data['sm_genre_modifier_2'])
-            # playlist = Playlist.objects.create(user=current_user, name=form.cleaned_data['sm_playlist_title'], playlist_id='666', smart_playlist=True, created_by_user=True)
+            playlist_name = form.cleaned_data['sm_playlist_title']
+            playlist = sp.user_playlist_create(user=current_user_id, name=playlist_name)
+            playlist_id = playlist['id']
+            playlist_obj = Playlist.objects.create(user=current_user, name=playlist_name, std_name=playlist_name, playlist_id=playlist_id, smart_playlist=True, created_by_user=True)
             
+
             # Create SmartPlaylistRules instance
-            # smart_playlist_rules = SmartPlaylistRules.objects.create(
-            #     playlist=playlist,
-                # sm_genre_join=form.cleaned_data['sm_genre_join'],
-                # sm_genre_modifier_1=form.cleaned_data['sm_genre_modifier_1'],
-                # sm_genre_modifier_2=form.cleaned_data['sm_genre_modifier_2']
-            # )
-            # smart_playlist_rules.sm_genre_options_select.set(form.cleaned_data['sm_genre_options_select'])
-            # smart_playlist_rules.save()
+            smart_playlist_rules = SmartPlaylistRules.objects.create(
+                user=current_user,
+                playlist=playlist_obj,
+                
+                rating_modifier = form.cleaned_data['sm_rating_modifier'],
+                rating = form.cleaned_data['sm_rating'],
+                rating_energy_join =form.cleaned_data['sm_rating_energy_join'],
+                energy_modifier = form.cleaned_data['sm_energy_modifier'],
+                energy = form.cleaned_data['sm_energy'],
+                genre_join = form.cleaned_data['sm_genre_join'],
+                genre_contain_choice = form.cleaned_data['sm_genre_modifier_1'],
+                genre_options_choice = form.cleaned_data['sm_genre_modifier_2'],
+                atmosphere_join = form.cleaned_data['sm_atmosphere_join'],
+                atmosphere_contain_choice = form.cleaned_data['sm_atmosphere_modifier_1'],
+                atmosphere_options_choice = form.cleaned_data['sm_atmosphere_modifier_2'],
+                emotion_join = form.cleaned_data['sm_emotion_join'],
+                emotion_contain_choice = form.cleaned_data['sm_emotion_modifier_1'],
+                emotion_options_choice = form.cleaned_data['sm_emotion_modifier_2'],
+                tags_join = form.cleaned_data['sm_tag_join'],
+                tags_contain_choice = form.cleaned_data['sm_tag_modifier_1'],
+                tags_options_choice =form.cleaned_data['sm_tag_modifier_2'],    
+            )
+            smart_playlist_rules.genres.set(form.cleaned_data['sm_genre_options_select'])
+            smart_playlist_rules.atmospheres.set(form.cleaned_data['sm_atmosphere_options_select'])
+            smart_playlist_rules.emotions.set(form.cleaned_data['sm_emotion_options_select'])
+            smart_playlist_rules.tags.set(form.cleaned_data['sm_tag_options_select'])
+
+            smart_playlist_rules.save()
             return playlists_view(request=request)  
-        # return HttpResponse(status=200)
+            # return HttpResponse(status=200)
     else:
         form = CombinedForm(user=current_user)
         # Initialize Spotipy with appropriate credentials
-        SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
-        SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-        SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
-        username = "ye6bq7h7l9wnphebox5b1jgqu"
-        scope = "playlist-read-private playlist-modify-private playlist-modify-public user-library-read user-library-modify"
-        client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
-        sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-        token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
-        sp = spotipy.Spotify(auth=token)
-        current_user_id = sp.current_user()['id']
-        # Make a call to the Spotify API to get the currently playing song
-        current_track = sp.current_user_playing_track()
-        user_details = sp.current_user()
-        display_name = user_details['display_name']
-        genres = current_user.get_genres()
-        atmospheres = Atmosphere.objects.all()
-        emotions = Emotion.objects.all()
-        tags = Tag.objects.filter(author=current_user)
-        
-        if current_track is not None and 'item' in current_track and current_track['item']['name'] != "":
-            song_name = current_track['item']['name']
-            artist_name = current_track['item']['artists'][0]['name']
-            album_art = current_track['item']['album']['images'][0]['url']
-            album_id = current_track['item']['album']['id']
-            album_name = current_track['item']['album']['name']
-            track_id = current_track['item']['id']
+    # SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+    # SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+    # SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
+    # username = "ye6bq7h7l9wnphebox5b1jgqu"
+    # scope = "playlist-read-private playlist-modify-private playlist-modify-public user-library-read user-library-modify"
+    # client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+    # sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    # token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
+    # sp = spotipy.Spotify(auth=token)
+    # current_user_id = sp.current_user()['id']
+    # Make a call to the Spotify API to get the currently playing song
+    current_track = sp.current_user_playing_track()
+    user_details = sp.current_user()
+    display_name = user_details['display_name']
+    genres = current_user.get_genres()
+    atmospheres = Atmosphere.objects.all()
+    emotions = Emotion.objects.all()
+    tags = Tag.objects.filter(author=current_user)
+    
+    if current_track is not None and 'item' in current_track and current_track['item']['name'] != "":
+        song_name = current_track['item']['name']
+        artist_name = current_track['item']['artists'][0]['name']
+        album_art = current_track['item']['album']['images'][0]['url']
+        album_id = current_track['item']['album']['id']
+        album_name = current_track['item']['album']['name']
+        track_id = current_track['item']['id']
+        energy_level = get_energy_level(track_id=track_id)
+        playback = sp.current_playback()
+        if playback['item']['id'] == track_id and playback['device']['is_active']:
+            now_playing = True    
+        else:
+            now_playing = False
+        if (check_library_bool(track_id=track_id)):
+            user_song = UserSong.objects.get(user=current_user, song__spotify_id=track_id)
+            user_song.last_played = datetime.now(timezone.utc)
+            user_song.save()
+            
+        return render(request, 'songmanager/add-smart-playlist.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name, 'album_name': album_name, 'genres':genres, 'atmospheres':atmospheres, 'emotions':emotions, 'tags':tags, 'form':form})
+    else: 
+        # If there is no currently playing track, retrieve the most recently played track instead
+        recent_tracks = sp.current_user_recently_played(limit=1)['items']
+        if recent_tracks:
+            # Extract information about the most recently played track
+            recent_track = recent_tracks[0]['track']
+            song_name = recent_track['name']
+            artist_name = recent_track['artists'][0]['name']
+            album_art = recent_track['album']['images'][0]['url']
+            album_id = recent_track['album']['id']
+            album_name = recent_track['album']['name']
+            track_id = recent_track['id']
             energy_level = get_energy_level(track_id=track_id)
-            playback = sp.current_playback()
-            if playback['item']['id'] == track_id and playback['device']['is_active']:
-                now_playing = True    
-            else:
-                now_playing = False
-            if (check_library_bool(track_id=track_id)):
-                user_song = UserSong.objects.get(user=current_user, song__spotify_id=track_id)
-                user_song.last_played = datetime.now(timezone.utc)
-                user_song.save()
-                
-            return render(request, 'songmanager/add-smart-playlist.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': now_playing, 'display_name': display_name, 'album_name': album_name, 'genres':genres, 'atmospheres':atmospheres, 'emotions':emotions, 'tags':tags, 'form':form})
-        else: 
-            # If there is no currently playing track, retrieve the most recently played track instead
-            recent_tracks = sp.current_user_recently_played(limit=1)['items']
-            if recent_tracks:
-                # Extract information about the most recently played track
-                recent_track = recent_tracks[0]['track']
-                song_name = recent_track['name']
-                artist_name = recent_track['artists'][0]['name']
-                album_art = recent_track['album']['images'][0]['url']
-                album_id = recent_track['album']['id']
-                album_name = recent_track['album']['name']
-                track_id = recent_track['id']
-                energy_level = get_energy_level(track_id=track_id)
-                # Pass the information about the most recently played track to the template
-                return render(request, 'songmanager/add-smart-playlist.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name, 'album_name': album_name, 'genres':genres, 'atmospheres':atmospheres, 'emotions':emotions, 'tags':tags, 'form':form})
-            else:
-                # If there are no recent tracks, return an error message to the template
-                return render(request, 'songmanager/add-smart-playlist.html', {'error_message': 'No song currently playing'})
-        
+            # Pass the information about the most recently played track to the template
+            return render(request, 'songmanager/add-smart-playlist.html', {'song_name': song_name, 'artist_name': artist_name, 'album_art': album_art, 'track_id': track_id, 'album_id': album_id, 'energy_level': energy_level, 'now_playing': False, 'display_name': display_name, 'album_name': album_name, 'genres':genres, 'atmospheres':atmospheres, 'emotions':emotions, 'tags':tags, 'form':form})
+        else:
+            # If there are no recent tracks, return an error message to the template
+            return render(request, 'songmanager/add-smart-playlist.html', {'error_message': 'No song currently playing'})
+    
 
 
 

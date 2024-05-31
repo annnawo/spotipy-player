@@ -25,7 +25,8 @@
 
                 <div class="add-playlists-btn-group">
                     <button class="add-playlists-btn-member new-folder-btn">New Folder</button>
-                    <button class="add-playlists-btn-member new-sm-playlist-btn"><a href="{% url 'add_smart_playlist' %}">New Smart Playlist</a></button>
+                    <button class="add-playlists-btn-member new-sm-playlist-btn"><a
+                            href="{% url 'add_smart_playlist' %}">New Smart Playlist</a></button>
                     <button class="add-playlists-btn-member new-std-playlist-btn">New Standard Playlist</button>
                 </div>
 
@@ -181,10 +182,12 @@
                             </div>
                         </div>
                         {% endfor %}
-
-
                         {% endif %}
-
+                        {% for ct in extra_smart_divs %}
+                        <div class="outer-pos-playlist-div empty-div-holder">
+                            <div class="playlist-main-holder-2"></div>
+                        </div>
+                        {% endfor %}
                     </div>
 
                 </div>
@@ -208,6 +211,40 @@
 
 
                     <div class="playlists-and-folders-main-container playlists-container">
+                        {% if standard_folders %}
+                        {% for folder in standard_folders %}
+
+                        <div class="folder-main-holder">
+                            <div class="folder-name-container">
+                                <h5 class="folder-name fl-n-2">{{ folder.name }}</h5>
+                            </div>
+
+                            <div class="edit-del-options-f">
+                                <div class="edf-positions">
+                                    <div class="edf-icons">
+                                        <button class="button-edit-del-f">edit</button>
+                                        <div><button class="eb-icon-btn">
+                                                <div class="star-elem-div"><span class="fa fa-star star-elem-3"></span>
+                                                </div>
+                                            </button></div>
+                                        <div class="eb-icon-trash"><button class="eb-icon-btn">
+                                                <img src="{% static '/images/trash_icon.png' %}" alt="delete symbol"
+                                                    class="trash-icon-2">
+                                            </button></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="folder-img-outer-container">
+                                <div class="folder-img-div"><img
+                                        src="{% static '/images/music_library_icon_black.png' %}" alt="folder icon"
+                                        class="folder-img"></div>
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+                        {% endif %}
                         {% if standard_playlists %}
                         {% for playlist in standard_playlists %}
                         <div class="outer-pos-playlist-div">
@@ -264,9 +301,12 @@
                             </div>
                         </div>
                         {% endfor %}
-
                         {% endif %}
-
+                        {% for ct in extra_std_divs %}
+                        <div class="outer-pos-playlist-div empty-div-holder">
+                            <div class="playlist-main-holder-2"></div>
+                        </div>
+                        {% endfor %}
                     </div>
 
 
